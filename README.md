@@ -87,25 +87,6 @@ src/
 2. Clique em **"Carregar extensão temporária..."**
 3. Selecione o arquivo `manifest.json`
 
-## 📦 Como Gerar o .zip para Publicação
-
-```bash
-python -c "import zipfile, os
-files = ['manifest.json','popup.html','popup.css',
-'icons/icon16.png','icons/icon48.png','icons/icon128.png','icons/icon16.svg',
-'src/core/constants.js','src/utils/date.js','src/utils/color.js',
-'src/data/emojis.js','src/models/note.js',
-'src/services/storage.service.js','src/services/export.service.js',
-'src/ui/notifications.js','src/ui/resize.js','src/ui/editor.js',
-'src/ui/emoji-picker.js','src/ui/color-picker.js','src/ui/notes.renderer.js',
-'src/ui/options-menu.js','src/core/note.controller.js','src/core/app.js',
-'src/index.js']
-with zipfile.ZipFile('sticky-pad-extensao.zip','w',zipfile.ZIP_DEFLATED) as z:
-    for f in files:
-        if os.path.exists(f):
-            z.write(f)"
-```
-
 ##  Versionamento
 
 - **1.0.0** → Versão inicial monolítica
