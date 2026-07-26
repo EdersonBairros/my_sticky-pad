@@ -1,0 +1,928 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    width: 350px;
+    min-width: 250px;
+    min-height: 200px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa;
+    overflow: hidden;
+    position: relative;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 200px;
+    position: relative;
+}
+
+/* ===== RESIZE HANDLES ===== */
+.resize-handle {
+    position: absolute;
+    z-index: 100;
+}
+
+.resize-handle-right {
+    top: 0;
+    right: 0;
+    width: 6px;
+    height: 100%;
+    cursor: ew-resize;
+}
+
+.resize-handle-bottom {
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 6px;
+    cursor: ns-resize;
+}
+
+.resize-handle-left {
+    top: 0;
+    left: 0;
+    width: 6px;
+    height: 100%;
+    cursor: ew-resize;
+}
+
+.resize-handle-corner {
+    bottom: 0;
+    right: 0;
+    width: 16px;
+    height: 16px;
+    cursor: nwse-resize;
+    background: linear-gradient(135deg, transparent 50%, #999 50%);
+    border-radius: 0 0 4px 0;
+}
+
+.resize-handle-corner:hover {
+    background: linear-gradient(135deg, transparent 50%, #666 50%);
+}
+
+.resize-handle-corner-ne {
+    top: 0;
+    right: 0;
+    width: 16px;
+    height: 16px;
+    cursor: nesw-resize;
+    background: linear-gradient(225deg, transparent 50%, #999 50%);
+    border-radius: 0 4px 0 0;
+}
+
+.resize-handle-corner-ne:hover {
+    background: linear-gradient(225deg, transparent 50%, #666 50%);
+}
+
+.resize-handle-right:hover,
+.resize-handle-left:hover {
+    background-color: rgba(0, 0, 0, 0.08);
+}
+
+.resize-handle-bottom:hover {
+    background-color: rgba(0, 0, 0, 0.08);
+}
+
+/* ===== HEADER ===== */
+.header {
+    background-color: #ffd93d;
+    padding: 12px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #f0c929;
+    flex-shrink: 0;
+}
+
+.header h1 {
+    font-size: 18px;
+    color: #333;
+    font-weight: 600;
+}
+
+.add-btn {
+    width: 32px;
+    height: 32px;
+    border: none;
+    background-color: #333;
+    color: #ffd93d;
+    font-size: 20px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s, background-color 0.2s;
+}
+
+.add-btn:hover {
+    background-color: #555;
+    transform: scale(1.25);
+}
+
+/* ===== HEADER ACTIONS (add + options) ===== */
+.header-actions {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.options-wrap {
+    position: relative;
+}
+
+.options-btn {
+    width: 32px;
+    height: 32px;
+    border: none;
+    background-color: #333;
+    color: #ffd93d;
+    font-size: 22px;
+    line-height: 1;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s, background-color 0.2s;
+}
+
+.options-btn:hover {
+    background-color: #555;
+    transform: scale(1.25);
+}
+
+.options-menu {
+    display: none;
+    position: absolute;
+    top: 38px;
+    right: 0;
+    min-width: 150px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 200;
+    padding: 4px;
+}
+
+.options-menu.open {
+    display: block;
+}
+
+.options-menu-item {
+    display: block;
+    width: 100%;
+    text-align: left;
+    border: none;
+    background: none;
+    padding: 8px 10px;
+    font-size: 13px;
+    color: #333;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.15s;
+}
+
+.options-menu-item:hover {
+    background-color: #f0f0f0;
+}
+
+/* ===== NOTES CONTAINER ===== */
+.notes-container {
+    flex: 1;
+    padding: 12px;
+    overflow-y: auto;
+    min-height: 0;
+}
+
+/* Estilo da nota (modo visualização) */
+.note-item {
+    background-color: #fff;
+    border-left: 4px solid #ffd93d;
+    border-radius: 6px;
+    padding: 10px 12px;
+    margin-bottom: 10px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    position: relative;
+    transition: box-shadow 0.2s;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.note-item:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* ===== COLOR PICKER BUTTON ===== */
+.color-btn {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 24px;
+    height: 24px;
+    border: 1px solid #ddd;
+    background: #fff;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+    z-index: 5;
+    opacity: 0;
+    line-height: 1;
+    padding: 0;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+.note-item:hover .color-btn {
+    opacity: 1;
+}
+
+.color-btn:hover {
+    background-color: #f0f0f0;
+    border-color: #bbb;
+    transform: scale(1.1);
+}
+
+.color-btn.active {
+    opacity: 1;
+    background-color: #e8e8e8;
+    border-color: #999;
+}
+
+/* ===== COLOR PICKER DROPDOWN ===== */
+.color-picker-dropdown {
+    display: none;
+    position: absolute;
+    top: 32px;
+    right: 4px;
+    width: 220px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 30;
+    padding: 10px;
+}
+
+.color-picker-dropdown.open {
+    display: block;
+}
+
+.color-picker-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+}
+
+.color-presets {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+}
+
+.color-preset {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.15s;
+    flex-shrink: 0;
+}
+
+.color-preset:hover {
+    transform: scale(1.15);
+}
+
+.color-preset.active {
+    border-color: #333;
+    box-shadow: 0 0 0 2px #fff, 0 0 0 4px #333;
+}
+
+.color-preset-add {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px dashed #bbb;
+    background: transparent;
+    cursor: pointer;
+    font-size: 16px;
+    color: #888;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+    flex-shrink: 0;
+}
+
+.color-preset-add:hover {
+    border-color: #888;
+    color: #555;
+    background-color: #f5f5f5;
+}
+
+.color-custom-section {
+    padding-top: 8px;
+    border-top: 1px solid #eee;
+}
+
+.color-custom-section .color-picker-label {
+    margin-bottom: 6px;
+}
+
+/* ===== GRADIENT PICKER (Canvas) ===== */
+.color-gradient-picker {
+    margin-bottom: 6px;
+}
+
+.color-spectrum-canvas {
+    width: 100%;
+    height: 20px;
+    border-radius: 4px;
+    cursor: crosshair;
+    display: block;
+    margin-bottom: 4px;
+    border: 1px solid #ddd;
+}
+
+.color-preview-bar {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.color-preview-swatch {
+    width: 18px;
+    height: 18px;
+    border-radius: 3px;
+    border: 1px solid #ccc;
+    flex-shrink: 0;
+    background-color: #fff;
+}
+
+.color-hex-input-group {
+    position: relative;
+    flex: 1;
+}
+
+.color-hex-input {
+    width: 100%;
+    padding: 5px 32px 5px 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 12px;
+    font-family: monospace;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.color-hex-input:focus {
+    border-color: #4caf50;
+}
+
+.color-hex-apply {
+    position: absolute;
+    right: 2px;
+    top: 50%;
+    transform: translateY(-50%);
+    padding: 2px 6px;
+    border: none;
+    background-color: #4caf50;
+    color: white;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 10px;
+    font-weight: 600;
+    transition: opacity 0.2s;
+    line-height: 1.4;
+}
+
+.color-hex-apply:hover {
+    opacity: 0.85;
+}
+
+/* ===== TEXTO FORMATADO (Visualização) ===== */
+.note-text {
+    font-size: 14px;
+    color: #333;
+    line-height: 1.5;
+    margin-bottom: 4px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    padding-left: 4px;
+}
+
+.note-text p {
+    margin: 0 0 6px 0;
+    padding: 0;
+}
+
+.note-text p:last-child {
+    margin-bottom: 0;
+}
+
+.note-text b,
+.note-text strong {
+    font-weight: 700;
+}
+
+.note-text i,
+.note-text em {
+    font-style: italic;
+}
+
+.note-text u {
+    text-decoration: underline;
+}
+
+.note-text s,
+.note-text strike,
+.note-text del {
+    text-decoration: line-through;
+}
+
+.note-text ul,
+.note-text ol {
+    margin: 4px 0 6px 0;
+    padding-left: 24px;
+    list-style-position: outside;
+}
+
+.note-text ul {
+    list-style-type: disc;
+}
+
+.note-text ol {
+    list-style-type: decimal;
+}
+
+.note-text li {
+    margin-bottom: 3px;
+    line-height: 1.5;
+    padding-left: 4px;
+}
+
+.note-text li:last-child {
+    margin-bottom: 0;
+}
+
+.note-text br {
+    display: block;
+    content: "";
+    margin: 4px 0;
+}
+
+/* ===== DATA E AÇÕES ===== */
+.note-date {
+    font-size: 11px;
+    color: #999;
+}
+
+.note-actions {
+    display: flex;
+    gap: 6px;
+    margin-top: 8px;
+    justify-content: flex-end;
+}
+
+.note-actions button {
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 3px 6px;
+    border-radius: 4px;
+    transition: background-color 0.2s, transform 0.15s;
+}
+
+.note-actions button:hover {
+    transform: scale(1.35);
+}
+
+.note-actions .edit-btn:hover {
+    background-color: #e3f2fd;
+}
+
+.note-actions .delete-btn:hover {
+    background-color: #ffebee;
+}
+
+/* ===== MODO EDIÇÃO ===== */
+.note-item.editing {
+    border-left-color: #4caf50;
+    padding: 0;
+    overflow: visible;
+}
+
+.note-item.editing .color-btn,
+.note-item.editing .color-picker-dropdown {
+    display: none !important;
+}
+
+/* Toolbar de formatação */
+.format-toolbar {
+    display: flex;
+    gap: 2px;
+    padding: 6px 8px;
+    background-color: #f0f0f0;
+    border-bottom: 1px solid #ddd;
+    flex-wrap: wrap;
+    position: sticky;
+    top: 0;
+    z-index: 5;
+}
+
+.format-toolbar .toolbar-group {
+    display: flex;
+    gap: 2px;
+    align-items: center;
+}
+
+.format-toolbar .toolbar-group+.toolbar-group {
+    margin-left: 4px;
+    padding-left: 4px;
+    border-left: 1px solid #ccc;
+}
+
+.format-btn {
+    width: 30px;
+    height: 30px;
+    border: 1px solid transparent;
+    background: transparent;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+    color: #444;
+}
+
+.format-btn:hover {
+    background-color: #e0e0e0;
+    border-color: #ccc;
+}
+
+.format-btn.active {
+    background-color: #d0d0d0;
+    border-color: #999;
+    color: #000;
+}
+
+.format-btn .bold-text {
+    font-weight: 700;
+}
+
+.format-btn .italic-text {
+    font-style: italic;
+}
+
+.format-btn .underline-text {
+    text-decoration: underline;
+}
+
+.format-btn .strike-text {
+    text-decoration: line-through;
+}
+
+/* ===== EDITOR WRAPPER (para emoji button) ===== */
+.editor-wrapper {
+    position: relative;
+}
+
+/* Contenteditable */
+.note-editor {
+    min-height: 80px;
+    max-height: 300px;
+    padding: 10px 12px 36px 12px;
+    font-family: inherit;
+    font-size: 14px;
+    line-height: 1.5;
+    outline: none;
+    overflow-y: auto;
+    cursor: text;
+    color: #333;
+}
+
+.note-editor:empty:before {
+    content: attr(data-placeholder);
+    color: #bbb;
+    pointer-events: none;
+}
+
+.note-editor:focus {
+    border-color: #4caf50;
+}
+
+.note-editor ul,
+.note-editor ol {
+    margin: 4px 0;
+    padding-left: 24px;
+}
+
+.note-editor li {
+    margin-bottom: 2px;
+}
+
+/* ===== EMOJI BUTTON ===== */
+.emoji-btn {
+    position: absolute;
+    bottom: 4px;
+    right: 4px;
+    width: 28px;
+    height: 28px;
+    border: 1px solid #ddd;
+    background: #fff;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+    z-index: 6;
+    line-height: 1;
+    padding: 0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.emoji-btn:hover {
+    background-color: #f0f0f0;
+    border-color: #bbb;
+    transform: scale(1.1);
+}
+
+.emoji-btn.active {
+    background-color: #e8e8e8;
+    border-color: #999;
+}
+
+/* ===== EMOJI PICKER ===== */
+.emoji-picker {
+    display: none;
+    position: absolute;
+    right: 4px;
+    width: 280px;
+    max-height: 220px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 50;
+    overflow: hidden;
+}
+
+.emoji-picker.open {
+    display: block;
+}
+
+.emoji-picker.open-up {
+    bottom: 36px;
+}
+
+.emoji-picker.open-down {
+    top: 4px;
+    bottom: auto;
+}
+
+.emoji-picker-header {
+    padding: 6px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: #f9f9f9;
+    border-bottom: 1px solid #eee;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.emoji-picker-categories {
+    display: flex;
+    gap: 2px;
+    padding: 4px 6px;
+    background: #f5f5f5;
+    border-bottom: 1px solid #eee;
+    overflow-x: auto;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.emoji-cat-btn {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    border: 1px solid transparent;
+    background: transparent;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+}
+
+.emoji-cat-btn:hover {
+    background-color: #e0e0e0;
+}
+
+.emoji-cat-btn.active {
+    background-color: #d0d0d0;
+    border-color: #bbb;
+}
+
+.emoji-picker-grid {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 2px;
+    padding: 8px;
+    max-height: 140px;
+    overflow-y: auto;
+}
+
+.emoji-item {
+    width: 30px;
+    height: 30px;
+    border: none;
+    background: transparent;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.1s;
+}
+
+.emoji-item:hover {
+    background-color: #e8e8e8;
+    transform: scale(1.2);
+}
+
+.emoji-picker-grid::-webkit-scrollbar {
+    width: 4px;
+}
+
+.emoji-picker-grid::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.emoji-picker-grid::-webkit-scrollbar-thumb {
+    background-color: #ddd;
+    border-radius: 2px;
+}
+
+/* ===== BOTÕES DE AÇÃO (Salvar/Cancelar) ===== */
+.edit-actions {
+    display: flex;
+    gap: 6px;
+    padding: 8px 12px;
+    justify-content: flex-end;
+    border-top: 1px solid #eee;
+    background-color: #fafafa;
+}
+
+.edit-actions button {
+    border: none;
+    padding: 5px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    transition: opacity 0.2s;
+}
+
+.edit-actions .save-btn {
+    background-color: #4caf50;
+    color: white;
+}
+
+.edit-actions .cancel-btn {
+    background-color: #f44336;
+    color: white;
+}
+
+.edit-actions button:hover {
+    opacity: 0.85;
+}
+
+/* ===== ESTADO VAZIO ===== */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+    color: #999;
+    text-align: center;
+}
+
+.empty-state .empty-icon {
+    font-size: 48px;
+    margin-bottom: 12px;
+}
+
+.empty-state p {
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+/* ===== FOOTER ===== */
+.footer {
+    padding: 10px 16px;
+    border-top: 1px solid #e0e0e0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #fff;
+    flex-shrink: 0;
+}
+
+.note-count {
+    font-size: 12px;
+    color: #888;
+}
+
+.clear-btn {
+    border: none;
+    background: none;
+    color: #f44336;
+    font-size: 12px;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: background-color 0.2s, transform 0.15s;
+}
+
+.clear-btn:hover {
+    background-color: #ffebee;
+    transform: scale(1.08);
+}
+
+/* ===== SCROLLBAR ===== */
+.notes-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.notes-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.notes-container::-webkit-scrollbar-thumb {
+    background-color: #ccc;
+    border-radius: 3px;
+}
+
+.notes-container::-webkit-scrollbar-thumb:hover {
+    background-color: #aaa;
+}
+
+.note-editor::-webkit-scrollbar {
+    width: 5px;
+}
+
+.note-editor::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.note-editor::-webkit-scrollbar-thumb {
+    background-color: #ddd;
+    border-radius: 3px;
+}
+
+.note-editor::-webkit-scrollbar-thumb:hover {
+    background-color: #bbb;
+}
+
+.emoji-picker-grid::-webkit-scrollbar {
+    width: 4px;
+}
+
+.emoji-picker-grid::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.emoji-picker-grid::-webkit-scrollbar-thumb {
+    background-color: #ddd;
+    border-radius: 2px;
+}

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>sticky-pad Lembretes</title>
+    <link rel="stylesheet" href="popup.css">
+</head>
+
+<body>
+    <div class="container">
+        <div class="resize-handle resize-handle-right" data-resize="right"></div>
+        <div class="resize-handle resize-handle-bottom" data-resize="bottom"></div>
+        <div class="resize-handle resize-handle-corner" data-resize="se"></div>
+        <div class="resize-handle resize-handle-corner-ne" data-resize="ne"></div>
+        <div class="resize-handle resize-handle-left" data-resize="left"></div>
+        <div class="header">
+            <h1>📝 Sticky-Pad</h1>
+            <div class="header-actions">
+                <button id="addNoteBtn" class="add-btn" title="Adicionar novo lembrete">+</button>
+                <div class="options-wrap">
+                    <button id="optionsBtn" class="options-btn" title="Mais opções">⋮</button>
+                    <div id="optionsMenu" class="options-menu">
+                        <button id="exportMenuItem" class="options-menu-item" data-action="export">📤 Exportar
+                            notas</button>
+                        <button id="importMenuItem" class="options-menu-item" data-action="import">📥 Importar
+                            notas</button>
+                        <input type="file" id="importFileInput" accept=".json,application/json" style="display: none;">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="notesContainer" class="notes-container">
+            <!-- Os lembretes serão inseridos aqui dinamicamente -->
+        </div>
+        <div class="footer">
+            <span id="noteCount" class="note-count">0 lembretes</span>
+            <button id="clearAllBtn" class="clear-btn" title="Limpar todos os lembretes">🗑️ Limpar tudo</button>
+        </div>
+    </div>
+    <script src="src/core/constants.js"></script>
+    <script src="src/utils/date.js"></script>
+    <script src="src/utils/color.js"></script>
+    <script src="src/data/emojis.js"></script>
+    <script src="src/models/note.js"></script>
+    <script src="src/services/storage.service.js"></script>
+    <script src="src/services/export.service.js"></script>
+    <script src="src/ui/notifications.js"></script>
+    <script src="src/ui/resize.js"></script>
+    <script src="src/ui/editor.js"></script>
+    <script src="src/ui/emoji-picker.js"></script>
+    <script src="src/ui/color-picker.js"></script>
+    <script src="src/ui/notes.renderer.js"></script>
+    <script src="src/ui/options-menu.js"></script>
+    <script src="src/core/note.controller.js"></script>
+    <script src="src/core/app.js"></script>
+    <script src="src/index.js"></script>
+</body>
+
+</html>

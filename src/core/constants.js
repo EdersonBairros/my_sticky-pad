@@ -1,0 +1,26 @@
+/**
+ * Constantes globais da aplicação.
+ * @module core/constants
+ */
+
+const STORAGE_KEYS = Object.freeze({
+    NOTES: 'postitNotes',
+    SIZE: 'postitSize',
+    FAVORITE_EMOJIS: 'postitFavoriteEmojis'
+});
+
+const RESIZE_LIMITS = Object.freeze({
+    MIN_WIDTH: 250,
+    MIN_HEIGHT: 200,
+    MAX_WIDTH: 800,
+    MAX_HEIGHT: 800
+});
+
+const PRESET_COLORS = Object.freeze([
+    { name: 'Amarelo', hex: '#FFF3CD' },
+    { name: 'Verde', hex: '#D4EDDA' },
+    { name: 'Azul', hex: '#D6EAF8' },
+    { name: 'Rosa', hex: '#F8D7DA' }
+]);
+
+const MAX_FAVORITE_EMOJIS = 24;
