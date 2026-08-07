@@ -40,7 +40,7 @@ function bootstrap() {
     _initToolbarDispatcher($.notesContainer);
     _initEmojiDispatchers($.notesContainer);
     _initGlobalCloseDispatchers();
-    _initCategoryDispatchers($.notesContainer);
+    _initCategoryDispatchers();
     _initEditorEvents();
     _initHexKeyHandler($.notesContainer);
     _initToolbarStateUpdaters($.notesContainer);
@@ -69,7 +69,14 @@ function _initActionDispatcher(container) {
             case 'set-color': if (target.dataset.color) applyColor(id, target.dataset.color); break;
             case 'toggle-custom': _toggleCustomColor(item); break;
             case 'apply-hex': _applyHexInput(item, id); break;
-            case 'category-toggle': openCategoryModal(id, item); break;
+            case 'category-toggle':
+                // Toggle: se o modal já está aberto, fecha; senão, abre.
+                if (document.querySelector('.category-modal')) {
+                    closeCategoryModal();
+                } else {
+                    openCategoryModal(id, item);
+                }
+                break;
         }
     });
 }
@@ -100,9 +107,14 @@ function _initEmojiDispatchers(container) {
     });
 }
 
-function _initCategoryDispatchers(container) {
+/*
+ * NOTA: os eventos de categoria escutam no `document` (e não no container)
+ * porque o modal foi movido para o `document.body` para usar position:fixed
+ * (evita ser cortado pelo overflow do container de notas).
+ */
+function _initCategoryDispatchers() {
     // Seletor de categoria (radio)
-    container.addEventListener('change', e => {
+    document.addEventListener('change', e => {
         const radio = e.target.closest('input[data-action="category-select"]');
         if (radio) {
             selectCategory(radio.value);
@@ -110,7 +122,7 @@ function _initCategoryDispatchers(container) {
     });
 
     // Cliques dentro do modal (adicionar, remover, desfazer)
-    container.addEventListener('click', e => {
+    document.addEventListener('click', e => {
         const target = e.target.closest('[data-action]');
         if (!target) return;
 
@@ -122,7 +134,8 @@ function _initCategoryDispatchers(container) {
                 break;
             }
             case 'category-remove': {
-                const nameEl = target.closest('.category-option').querySelector('.category-name');
+                const option = target.closest('.category-option');
+                const nameEl = option ? option.querySelector('.category-name') : null;
                 if (nameEl) removeCategory(nameEl.textContent);
                 break;
             }
@@ -134,7 +147,7 @@ function _initCategoryDispatchers(container) {
     });
 
     // Enter no input de categoria
-    container.addEventListener('keydown', e => {
+    document.addEventListener('keydown', e => {
         const input = e.target.closest('.category-input');
         if (input && e.key === 'Enter') {
             e.preventDefault();

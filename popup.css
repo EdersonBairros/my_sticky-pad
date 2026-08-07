@@ -809,19 +809,20 @@ body {
     transform: scale(1.2);
 }
 
-/* ===== MODAL DE CATEGORIAS ===== */
+/* ===== MODAL DE CATEGORIAS (popup flutuante) =====
+ * Posicionado com `position: fixed` para que nunca seja cortado
+ * pelo overflow do container de notas (bug 2.2).
+ * A posição (left/bottom) é calculada em JS via getBoundingClientRect.
+ */
 .category-modal {
-    position: absolute;
-    top: 38px;
-    left: 8px;
-    right: 8px;
-    z-index: 40;
+    position: fixed;
+    z-index: 999;
+    width: 220px;
     background: #fff;
     border: 1px solid #ddd;
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     padding: 10px;
-    margin-top: 4px;
 }
 
 .category-modal-title {
@@ -988,34 +989,48 @@ body {
 }
 
 /* ===== BADGE DA CATEGORIA NA NOTA ===== */
+/*
+ * O badge fica ao lado DIREITO do botão de alterar cor (🎨).
+ * O 🎨 está posicionado em `top: 6px; right: 6px` com 24px de largura.
+ * Portanto, para o badge aparecer à direita dele (não por cima),
+ * usamos `right: 36px` (= 6px + 24px + 6px de espaçamento) e `top: 8px`
+ * para alinhar verticalmente com o botão.
+ */
 .note-category-badge {
     position: absolute;
-    top: 32px;
-    right: 6px;
+    top: 8px;
+    right: 36px;
     display: inline-block;
     background-color: #ffd93d;
     color: #333;
     font-size: 11px;
     font-weight: 600;
-    padding: 2px 8px;
-    border-radius: 10px;
-    max-width: 120px;
+    padding: 3px 10px;
+    border-radius: 4px;
+    max-width: 100px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     cursor: default;
     z-index: 4;
+    border: 1px solid #e0c820;
 }
 
 /* ===== BOTÕES DE AÇÃO (Salvar/Cancelar) ===== */
 .edit-actions {
     display: flex;
+    align-items: center;
+    justify-content: space-between;
     gap: 6px;
     padding: 8px 12px;
-    justify-content: flex-end;
     border-top: 1px solid #eee;
     background-color: #fafafa;
+}
+
+.edit-actions-right {
+    display: flex;
+    gap: 6px;
 }
 
 .edit-actions button {

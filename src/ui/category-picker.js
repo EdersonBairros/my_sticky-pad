@@ -17,9 +17,6 @@ function openCategoryModal(noteId, noteItem) {
     closeColorPickers();
     closeCategoryModal();
 
-    const existing = noteItem.querySelector('.category-modal');
-    if (existing) existing.remove();
-
     const modal = document.createElement('div');
     modal.className = 'category-modal';
     modal.innerHTML = `
@@ -30,11 +27,45 @@ function openCategoryModal(noteId, noteItem) {
             <button class="category-check-btn" data-action="category-add" title="Salvar categoria">✓</button>
         </div>
     `;
-    noteItem.appendChild(modal);
+
+    // Anexa ao body porque o modal usa position:fixed (não é cortado pelo overflow do container).
+    document.body.appendChild(modal);
+    _positionCategoryModal(modal, noteItem);
     _renderCategoryList(modal, noteItem);
 
     const input = modal.querySelector('.category-input');
     if (input) setTimeout(() => input.focus(), 50);
+}
+
+/**
+ * Posiciona o modal de categorias ao lado direito do botão engrenagem,
+ * garantindo que fique dentro da viewport (nunca cortado).
+ * @private
+ * @param {HTMLElement} modal
+ * @param {HTMLElement} noteItem
+ */
+function _positionCategoryModal(modal, noteItem) {
+    const gearBtn = noteItem.querySelector('[data-action="category-toggle"]');
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const modalWidth = 220;
+    const gap = 6;
+
+    let left = (gearBtn ? gearBtn.getBoundingClientRect().right : 8) + gap;
+    let top = gearBtn ? gearBtn.getBoundingClientRect().top : 0;
+
+    // Evita estourar à direita: se não couber, abre pelo lado esquerdo da engrenagem.
+    if (left + modalWidth > vw) {
+        left = (gearBtn ? gearBtn.getBoundingClientRect().left : 8) - modalWidth - gap;
+    }
+    // Garante limite mínimo à esquerda.
+    left = Math.max(8, left);
+
+    // Limites verticais: não ultrapassar o topo/rodapé da janela.
+    top = Math.max(8, Math.min(top, Math.max(8, vh - 250)));
+
+    modal.style.left = left + 'px';
+    modal.style.top = top + 'px';
 }
 
 /**
@@ -82,9 +113,12 @@ function addCategoryFromInput(input) {
         _showCategoryFeedback(input, result.message || 'Erro', 'error');
         return;
     }
+    // Ponto 3: ao criar a categoria, ela já é selecionada para a nota
+    // e o modal é fechado automaticamente.
     input.value = '';
-    _refreshCategoryModal();
-    showToast(`Categoria "${value}" criada!`, 'success');
+    selectCategory(value);
+    closeCategoryModal();
+    showToast(`Categoria "${value}" criada e selecionada!`, 'success');
 }
 
 /**
@@ -98,8 +132,12 @@ function removeCategory(name) {
         return;
     }
 
-    _showUndoOption(name);
+    // Re-renderiza a lista PRIMEIRO (removendo a categoria da tela) e só
+    // depois exibe o [Desfazer]. A ordem importa: _refreshCategoryModal
+    // limpa o innerHTML da lista, o que removeria o Desfazer se ele
+    // fosse adicionado antes.
     _refreshCategoryModal();
+    _showUndoOption(name);
 }
 
 /**
@@ -184,7 +222,9 @@ function _showCategoryFeedback(input, message, type) {
 function _refreshCategoryModal() {
     const noteItem = document.querySelector(`.note-item[data-id="${_activeNoteId}"]`);
     if (!noteItem) return;
-    const modal = noteItem.querySelector('.category-modal');
+    // O modal agora é anexado ao document.body (para position:fixed), então
+    // buscamos nele em vez de dentro do note-item.
+    const modal = document.querySelector('.category-modal');
     if (modal) _renderCategoryList(modal, noteItem);
 }
 
@@ -195,19 +235,12 @@ function _refreshCategoryModal() {
 function selectCategory(name) {
     const note = getNoteById(_activeNoteId);
     if (!note) return;
+    // Apenas altera em memória — NÃO persiste aqui.
+    // A persistência acontece no saveEditing (ou é revertida no cancelEditing).
     note.category = name;
-    storagePersist();
     _refreshCategoryModal();
     showToast(`Categoria "${name}" selecionada`, 'success');
-}
-
-/**
- * Remove a categoria atribuída à nota (limpa seleção).
- */
-function clearCategorySelection() {
-    const note = getNoteById(_activeNoteId);
-    if (!note) return;
-    note.category = null;
-    storagePersist();
-    _refreshCategoryModal();
+    // Re-foca o editor para não perder o texto digitado
+    const editor = document.querySelector('.note-editor');
+    if (editor) editor.focus();
 }

@@ -58,9 +58,11 @@ function _buildEditingNote(div, note) {
             <button class="emoji-btn" data-action="emoji-toggle" title="Inserir emoji">😊</button>
         </div>
         <div class="edit-actions">
-            <button class="save-btn" data-action="save">💾 Salvar</button>
-            <button class="cancel-btn" data-action="cancel">❌ Cancelar</button>
             <button class="category-btn" data-action="category-toggle" title="Categorias">⚙️</button>
+            <div class="edit-actions-right">
+                <button class="save-btn" data-action="save">💾 Salvar</button>
+                <button class="cancel-btn" data-action="cancel">❌ Cancelar</button>
+            </div>
         </div>
     `;
 

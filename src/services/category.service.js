@@ -28,22 +28,6 @@ function getAllCategories() {
 }
 
 /**
- * Retorna apenas categorias predefinidas.
- * @returns {string[]}
- */
-function getPredefinedCategories() {
-    return [...PREDEFINED_CATEGORIES];
-}
-
-/**
- * Retorna apenas categorias customizadas.
- * @returns {string[]}
- */
-function getCustomCategories() {
-    return [..._customCategories];
-}
-
-/**
  * Verifica se a categoria é predefinida.
  * @param {string} name
  * @returns {boolean}

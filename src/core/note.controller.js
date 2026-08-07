@@ -7,6 +7,12 @@
 let _editingId = null;
 let _notesContainer = null;
 let _noteCountElement = null;
+/**
+ * Backup da categoria original da nota em edição (rollback no Cancelar).
+ * Usa um "sentinela" para diferenciar "sem categoria" (null) de "não iniciado".
+ */
+let _editingOriginalCategory = null;
+let _hasCategoryBackup = false;
 
 /**
  * Inicializa o controlador.
@@ -56,12 +62,18 @@ function startEditing(id) {
             }
         }
     }
+
+    // Backup da categoria original para rollback no Cancelar.
+    const note = getNoteById(id);
+    _editingOriginalCategory = note ? note.category : null;
+    _hasCategoryBackup = true;
+
     _editingId = id;
     renderNotes(_notesContainer, _editingId);
 }
 
 /**
- * Salva o conteúdo editado de uma nota.
+ * Salva o conteúdo editado de uma nota. A categoria alterada é confirmada aqui.
  * @param {string} id
  */
 function saveEditing(id) {
@@ -76,13 +88,16 @@ function saveEditing(id) {
     note.text = html;
     note.createdAt = new Date().toISOString();
     _editingId = null;
+    _editingOriginalCategory = null;
+    _hasCategoryBackup = false;
     storagePersist();
     renderNotes(_notesContainer, _editingId);
     updateNoteCount(_noteCountElement);
 }
 
 /**
- * Cancela o modo de edição. Se a nota estava vazia, exclui.
+ * Cancela o modo de edição. Restaura a categoria original (rollback).
+ * Se a nota estava vazia, exclui.
  */
 function handleCancelEditing() {
     const note = getNoteById(_editingId);
@@ -90,7 +105,13 @@ function handleCancelEditing() {
         handleDeleteNote(_editingId);
         return;
     }
+    if (note && _hasCategoryBackup) {
+        note.category = _editingOriginalCategory;
+        storagePersist();
+    }
     _editingId = null;
+    _editingOriginalCategory = null;
+    _hasCategoryBackup = false;
     renderNotes(_notesContainer, _editingId);
 }
 

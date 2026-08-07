@@ -14,6 +14,13 @@ Uma extensão de navegador (Chrome/Firefox Manifest V3) que funciona como um blo
 - ✅ Importar notas de arquivo JSON (adiciona às existentes)
 - ✅ Persistência local (localStorage)
 - ✅ Modo edição com toolbar de formatação
+- ✅ **Categorias de notas** — organize lembretes por categoria (Trabalho, Escola, Casa + personalizadas)
+  - Botão ⚙️ no rodapé da nota em edição
+  - Modal flutuante com radio-buttons
+  - Criar até 5 categorias personalizadas (máx. 15 caracteres)
+  - Excluir categorias com opção "Desfazer" (2s)
+  - Bloqueio de exclusão se a categoria estiver em uso (feedback visual "Categoria em uso")
+  - Badge/caixinha retangular da categoria na listagem da nota
 
 ## 🏗️ Arquitetura
 
@@ -28,22 +35,25 @@ src/
 ├── data/
 │   └── emojis.js              → Dados puros dos emojis organizados por categoria
 ├── models/
-│   └── note.js                → Modelo Note (factory e validação)
+│   └── note.js                → Modelo Note (factory, validação e campo `category`)
 ├── services/
 │   ├── storage.service.js     → Persistência em localStorage (sem acoplamento com UI)
-│   └── export.service.js      → Serialização, download e parse de JSON
+│   ├── export.service.js      → Serialização, download e parse de JSON
+│   └── category.service.js    → CRUD de categorias (predefinidas + personalizadas)
 ├── ui/
 │   ├── notes.renderer.js      → Criação e renderização dos elementos DOM das notas
 │   ├── editor.js              → Toolbar de formatação e comandos contenteditable
 │   ├── color-picker.js        → Seletor de cores com gradiente canvas
 │   ├── emoji-picker.js        → Seletor de emojis com categorias, scroll infinito e favoritos
+│   ├── category-picker.js     → Modal de categorias da nota (radio, criar/excluir, desfazer)
 │   ├── resize.js              → Handles de redimensionamento do popup
 │   ├── options-menu.js        → Menu de opções (⋮) com exportar/importar
 │   └── notifications.js       → Sistema de notificações toast
 ├── utils/
 │   ├── date.js                → Formatação relativa de datas
-│   └── color.js               → Utilitários de cor (escurecer, validar hex)
-└── index.js                   → Entry point (DOMContentLoaded → bootstrap)
+│   ├── color.js               → Utilitários de cor (escurecer, validar hex)
+│   └── dom.js                 → escapeHtml (proteção XSS)
+├── index.js                   → Entry point (DOMContentLoaded → bootstrap)
 ```
 
 ### Princípios
@@ -94,3 +104,4 @@ src/
 - **2.1.0** → Favoritos + scroll infinito em emojis
 - **2.2.0** → Novo ícone com gradiente
 - **3.0.0** → Refatoração completa com Clean Architecture
+- **3.1.0** → Feature de Categorias de notas (modal, CRUD, desfazer, badge) + correções de UX
