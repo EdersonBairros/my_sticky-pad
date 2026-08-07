@@ -142,7 +142,7 @@ function handleCancelEditing() {
  */
 async function handleClearAllNotes() {
     if (getNotes().length === 0) return;
-    const confirmed = await showConfirm('Tem certeza que deseja limpar todos os lembretes?');
+    const confirmed = await showConfirm('Limpar todos os lembretes?');
     if (!confirmed) return;
     storageClearAll();
     _editingId = null;

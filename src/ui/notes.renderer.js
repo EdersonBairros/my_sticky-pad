@@ -110,10 +110,12 @@ function _buildViewNote(div, note) {
         ${note.category ? `<span class="note-category-badge">${escapeHtml(note.category)}</span>` : ''}
         ${note.title ? `<div class="note-title">${escapeHtml(note.title)}</div>` : ''}
         <div class="note-text">${sanitizeHtml(note.text || '')}</div>
-        <div class="note-date">${formatDate(note.createdAt)}</div>
-        <div class="note-actions">
-            <button class="edit-btn" data-action="edit" title="Editar">✏️</button>
-            <button class="delete-btn" data-action="delete" title="Excluir">🗑️</button>
+        <div class="note-footer">
+            <span class="note-date">${formatDate(note.createdAt)}</span>
+            <div class="note-actions">
+                <button class="edit-btn" data-action="edit" title="Editar">✏️</button>
+                <button class="delete-btn" data-action="delete" title="Excluir">🗑️</button>
+            </div>
         </div>
     `;
 

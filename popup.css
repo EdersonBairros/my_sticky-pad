@@ -1,3 +1,42 @@
+/*
+ * ============================================================================
+ * SISTEMA TIPOGRÁFICO (uma família só + hierarquia)
+ * ============================================================================
+ * Filosofia (estilo iOS/Windows nativo): usar UMA família — a Segoe UI, fonte
+ * nativa do Windows — e criar hierarquia por TAMANHO, PESO, ENTRELINHA,
+ * ESPAÇAMENTO e COR, em vez de misturar fontes. Toda a UI referencia estas
+ * variáveis; para reajustar o "tom" da extensão, mexa aqui.
+ */
+:root {
+    --font-ui: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    --font-mono: 'Consolas', 'Courier New', monospace;
+
+    /* Cores de texto */
+    --text-primary: #2b2b2b;
+    --text-secondary: #6b6b6b;
+    --text-muted: #9a9a9a;
+    --text-on-accent: #5f4b00;
+
+    /* Escala de tamanho (popup compacto de 350px) */
+    --fs-app-title: 17px;
+    --fs-note-title: 16px;
+    --fs-body: 14px;
+    --fs-ui: 13px;
+    --fs-caption: 12px;
+    --fs-micro: 11px;
+
+    /* Pesos — regular, médio, semibold e negrito (ênfase) */
+    --fw-regular: 400;
+    --fw-medium: 500;
+    --fw-semibold: 600;
+    --fw-bold: 700;
+
+    /* Entrelinha e espaçamento entre letras */
+    --lh-body: 1.55;
+    --ls-tight: -0.2px;
+    --ls-label: 0.4px;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -8,7 +47,8 @@ body {
     width: 350px;
     min-width: 250px;
     min-height: 200px;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: var(--font-ui);
+    color: var(--text-primary);
     background-color: #f8f9fa;
     overflow: hidden;
     position: relative;
@@ -101,9 +141,10 @@ body {
 }
 
 .header h1 {
-    font-size: 18px;
-    color: #333;
-    font-weight: 600;
+    font-size: var(--fs-app-title);
+    color: var(--text-primary);
+    font-weight: var(--fw-semibold);
+    letter-spacing: var(--ls-tight);
 }
 
 .add-btn {
@@ -183,8 +224,9 @@ body {
     border: none;
     background: none;
     padding: 8px 10px;
-    font-size: 13px;
-    color: #333;
+    font-size: var(--fs-ui);
+    font-weight: var(--fw-bold);
+    color: var(--text-primary);
     border-radius: 4px;
     cursor: pointer;
     transition: background-color 0.15s;
@@ -279,11 +321,11 @@ body {
 }
 
 .color-picker-label {
-    font-size: 11px;
-    font-weight: 600;
-    color: #666;
+    font-size: var(--fs-micro);
+    font-weight: var(--fw-semibold);
+    color: var(--text-secondary);
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: var(--ls-label);
     margin-bottom: 8px;
 }
 
@@ -385,8 +427,9 @@ body {
     padding: 5px 32px 5px 8px;
     border: 1px solid #ddd;
     border-radius: 4px;
-    font-size: 12px;
-    font-family: monospace;
+    font-size: var(--fs-caption);
+    font-family: var(--font-mono);
+    color: var(--text-primary);
     outline: none;
     transition: border-color 0.2s;
 }
@@ -406,8 +449,8 @@ body {
     color: white;
     border-radius: 3px;
     cursor: pointer;
-    font-size: 10px;
-    font-weight: 600;
+    font-size: var(--fs-micro);
+    font-weight: var(--fw-semibold);
     transition: opacity 0.2s;
     line-height: 1.4;
 }
@@ -423,10 +466,11 @@ body {
  * badge de categoria no canto superior direito, evitando sobreposição.
  */
 .note-title {
-    font-family: 'Trebuchet MS', 'Segoe UI', Tahoma, sans-serif;
-    font-weight: 700;
-    font-size: 15px;
-    color: #222;
+    font-family: var(--font-ui);
+    font-weight: var(--fw-semibold);
+    font-size: var(--fs-note-title);
+    letter-spacing: var(--ls-tight);
+    color: var(--text-primary);
     line-height: 1.3;
     margin-bottom: 4px;
     padding-left: 4px;
@@ -441,10 +485,11 @@ body {
     border-bottom: 1px solid #ddd;
     border-radius: 6px 6px 0 0;
     padding: 10px 12px;
-    font-family: 'Trebuchet MS', 'Segoe UI', Tahoma, sans-serif;
-    font-weight: 700;
-    font-size: 15px;
-    color: #222;
+    font-family: var(--font-ui);
+    font-weight: var(--fw-semibold);
+    font-size: var(--fs-note-title);
+    letter-spacing: var(--ls-tight);
+    color: var(--text-primary);
     background-color: #fafafa;
     outline: none;
     transition: background-color 0.2s, border-color 0.2s;
@@ -462,9 +507,9 @@ body {
 
 /* ===== TEXTO FORMATADO (Visualização) ===== */
 .note-text {
-    font-size: 14px;
-    color: #333;
-    line-height: 1.5;
+    font-size: var(--fs-body);
+    color: var(--text-primary);
+    line-height: var(--lh-body);
     margin-bottom: 4px;
     word-wrap: break-word;
     overflow-wrap: break-word;
@@ -532,15 +577,27 @@ body {
 }
 
 /* ===== DATA E AÇÕES ===== */
+/*
+ * Rodapé da nota: data fixada na borda inferior-esquerda e ações (editar/
+ * excluir) na direita, na mesma linha — leitura mais organizada.
+ */
+.note-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 8px;
+}
+
 .note-date {
-    font-size: 11px;
-    color: #999;
+    font-size: var(--fs-micro);
+    color: var(--text-muted);
+    letter-spacing: 0.2px;
 }
 
 .note-actions {
     display: flex;
     gap: 6px;
-    margin-top: 8px;
     justify-content: flex-end;
 }
 
@@ -656,12 +713,12 @@ body {
     max-height: 300px;
     padding: 10px 12px 36px 12px;
     font-family: inherit;
-    font-size: 14px;
-    line-height: 1.5;
+    font-size: var(--fs-body);
+    line-height: var(--lh-body);
     outline: none;
     overflow-y: auto;
     cursor: text;
-    color: #333;
+    color: var(--text-primary);
 }
 
 .note-editor:empty:before {
@@ -747,11 +804,11 @@ body {
 
 .emoji-picker-header {
     padding: 6px 10px;
-    font-size: 11px;
-    font-weight: 600;
-    color: #666;
+    font-size: var(--fs-micro);
+    font-weight: var(--fw-semibold);
+    color: var(--text-secondary);
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: var(--ls-label);
     background: #f9f9f9;
     border-bottom: 1px solid #eee;
     position: sticky;
@@ -870,9 +927,10 @@ body {
 }
 
 .category-modal-title {
-    font-weight: 700;
-    font-size: 13px;
-    color: #333;
+    font-weight: var(--fw-semibold);
+    font-size: var(--fs-body);
+    letter-spacing: var(--ls-tight);
+    color: var(--text-primary);
     margin-bottom: 8px;
     padding-bottom: 6px;
     border-bottom: 1px solid #eee;
@@ -895,8 +953,8 @@ body {
     border-radius: 4px;
     cursor: pointer;
     transition: background-color 0.15s;
-    font-size: 13px;
-    color: #333;
+    font-size: var(--fs-ui);
+    color: var(--text-primary);
 }
 
 .category-option:hover {
@@ -948,7 +1006,8 @@ body {
     padding: 6px 8px;
     border: 1px solid #ddd;
     border-radius: 4px;
-    font-size: 12px;
+    font-size: var(--fs-ui);
+    color: var(--text-primary);
     outline: none;
     transition: border-color 0.2s;
 }
@@ -989,8 +1048,8 @@ body {
 
 .category-in-use-feedback {
     color: #f44336;
-    font-size: 11px;
-    font-weight: 600;
+    font-size: var(--fs-micro);
+    font-weight: var(--fw-semibold);
     white-space: nowrap;
     flex-shrink: 0;
 }
@@ -1020,8 +1079,8 @@ body {
     display: block;
     text-align: center;
     color: #2196f3;
-    font-size: 12px;
-    font-weight: 600;
+    font-size: var(--fs-caption);
+    font-weight: var(--fw-semibold);
     cursor: pointer;
     padding: 4px;
     border-radius: 4px;
@@ -1046,9 +1105,10 @@ body {
     right: 36px;
     display: inline-block;
     background-color: #ffd93d;
-    color: #333;
-    font-size: 11px;
-    font-weight: 600;
+    color: var(--text-on-accent);
+    font-size: var(--fs-micro);
+    font-weight: var(--fw-semibold);
+    letter-spacing: 0.2px;
     padding: 3px 10px;
     border-radius: 4px;
     max-width: 100px;
@@ -1082,8 +1142,8 @@ body {
     padding: 5px 12px;
     border-radius: 4px;
     cursor: pointer;
-    font-size: 12px;
-    font-weight: 500;
+    font-size: var(--fs-ui);
+    font-weight: var(--fw-medium);
     transition: opacity 0.2s;
 }
 
@@ -1124,7 +1184,7 @@ body {
     align-items: center;
     justify-content: center;
     padding: 40px 20px;
-    color: #999;
+    color: var(--text-muted);
     text-align: center;
 }
 
@@ -1134,8 +1194,9 @@ body {
 }
 
 .empty-state p {
-    font-size: 14px;
-    line-height: 1.5;
+    font-size: var(--fs-body);
+    line-height: var(--lh-body);
+    color: var(--text-secondary);
 }
 
 /* ===== FOOTER ===== */
@@ -1150,15 +1211,16 @@ body {
 }
 
 .note-count {
-    font-size: 12px;
-    color: #888;
+    font-size: var(--fs-caption);
+    color: var(--text-muted);
 }
 
 .clear-btn {
     border: none;
     background: none;
     color: #f44336;
-    font-size: 12px;
+    font-size: var(--fs-caption);
+    font-weight: var(--fw-bold);
     cursor: pointer;
     padding: 4px 8px;
     border-radius: 4px;
@@ -1204,9 +1266,9 @@ body {
 }
 
 .confirm-message {
-    font-size: 14px;
-    color: #333;
-    line-height: 1.5;
+    font-size: var(--fs-body);
+    color: var(--text-primary);
+    line-height: var(--lh-body);
     margin-bottom: 14px;
 }
 
@@ -1221,8 +1283,8 @@ body {
     padding: 6px 14px;
     border-radius: 4px;
     cursor: pointer;
-    font-size: 12px;
-    font-weight: 500;
+    font-size: var(--fs-ui);
+    font-weight: var(--fw-medium);
     transition: opacity 0.2s;
 }
 
@@ -1232,7 +1294,7 @@ body {
 
 .confirm-cancel {
     background-color: #e0e0e0;
-    color: #333;
+    color: var(--text-primary);
 }
 
 .confirm-ok {

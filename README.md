@@ -5,7 +5,7 @@ Uma extensão de navegador (Chrome/Firefox Manifest V3) que funciona como um blo
 ## ✨ Funcionalidades
 
 - ✅ Criar, editar e excluir lembretes
-- ✅ **Título por nota** (opcional, até 20 caracteres) — fixa no topo-esquerdo da nota na listagem, em fonte Trebuchet MS negrito
+- ✅ **Título por nota** (opcional, até 20 caracteres) — fixa no topo-esquerdo da nota na listagem, com hierarquia tipográfica (Segoe UI semibold)
 - ✅ Formatação de texto (negrito, itálico, sublinhado, listas)
 - ✅ Seletor de emojis com categorias e favoritos
 - ✅ Rolagem infinita entre categorias de emoji
@@ -107,7 +107,7 @@ modo que usuários **não perdem notas** ao atualizar.
 
 Campos (ver `models/note.js`):
 
-- `title` → **título** curto e opcional (texto puro, máx. `MAX_TITLE_LENGTH` = 20 chars). Exibido no topo-esquerdo da nota na listagem (fonte Trebuchet MS negrito).
+- `title` → **título** curto e opcional (texto puro, máx. `MAX_TITLE_LENGTH` = 20 chars). Exibido no topo-esquerdo da nota na listagem (Segoe UI semibold, 16px — ver Sistema tipográfico).
 - `text` → corpo em HTML rico (sanitizado).
 - `createdAt` → data de **criação**, imutável (é a data exibida na nota).
 - `updatedAt` → data da **última edição**, usada para **ordenar** (mais recente no topo).
@@ -115,6 +115,26 @@ Campos (ver `models/note.js`):
 **Regra de "nota em branco"**: uma nota só é descartada se estiver sem corpo **E** sem título — portanto uma nota só com título é válida e é salva normalmente.
 
 Notas antigas/importadas sem `updatedAt` fazem *backfill* a partir do `createdAt`; sem `title`, tratam o título como vazio (não quebram nada).
+
+## 🔡 Sistema tipográfico
+
+Uma **família única** — `Segoe UI` (fonte nativa do Windows) — com hierarquia
+criada por **tamanho, peso, cor e espaçamento** (nunca se misturam fontes).
+Definido em variáveis CSS no topo de `popup.css` (`:root`), que é o **ponto
+único** para reajustar o "tom" da extensão inteira.
+
+| Papel | Tamanho | Peso | Cor |
+|-------|---------|------|-----|
+| Título da extensão | 17px | 600 | primário |
+| Título da nota | 16px | 600 | primário |
+| Corpo / editor | 14px | 400 | primário |
+| Botões, menus, inputs, radios | 13px | 500/400 | primário |
+| Contador, textos auxiliares | 12px | 400 | muted |
+| Data e rótulos (ex.: CORES) | 11px | 600 | muted/secundário |
+
+Cores de texto em 3 tons: `--text-primary` (#2b2b2b), `--text-secondary`
+(#6b6b6b), `--text-muted` (#9a9a9a). A fonte monoespaçada fica restrita ao campo
+de código hexadecimal de cor (`--font-mono`).
 
 ## ⚠️ Limitações conhecidas / Débito técnico
 
@@ -176,3 +196,4 @@ Seguimos **SemVer** (`MAJOR.MINOR.PATCH`). A cada mudança, a versão em
 | **3.2.0** | 🟡 MINOR | Segurança e limpeza: sanitização XSS (`sanitizeHtml`), migração para `chrome.storage.local` **com migração automática de dados legados** (sem perda para o usuário), CSP explícito no manifest, separação `createdAt`/`updatedAt`, e `confirm()` nativo → modal não-bloqueante |
 | **3.2.1** | 🟢 PATCH | Corrige o bug "Nota em branco": nota nova vira rascunho só em memória (persiste apenas ao salvar com conteúdo), então fechar o popup antes de salvar não deixa mais notas vazias. Inclui limpeza defensiva de notas em branco legadas no carregamento |
 | **3.3.0** | 🟡 MINOR | Título opcional por nota (máx. 20 chars, Trebuchet MS negrito no topo-esquerdo da listagem). Nota é válida com título OU corpo. Retrocompatível: notas antigas sem `title` funcionam normalmente. Export passa a v3 (import tolerante a v1/v2) |
+| **3.3.1** | 🟢 PATCH | Sistema tipográfico unificado: família única (Segoe UI) com hierarquia por tamanho/peso/cor/espaçamento, aplicado a todas as superfícies (cabeçalho, notas, inputs, botões, menus, alertas, radios). Título da nota migra de Trebuchet MS para Segoe UI semibold. Ajustes de UX: negrito em Exportar/Importar e "Limpar tudo", mensagem de limpar encurtada ("Limpar todos os lembretes?"), e data reposicionada no rodapé da nota (borda inferior-esquerda). Sem mudança de comportamento |
