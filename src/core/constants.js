@@ -29,3 +29,6 @@ const MAX_FAVORITE_EMOJIS = 24;
 const PREDEFINED_CATEGORIES = Object.freeze(['Trabalho', 'Escola', 'Casa']);
 const MAX_CUSTOM_CATEGORIES = 5;
 const MAX_CUSTOM_CATEGORIES_LENGTH = 15;
+
+// Título da nota: curto de propósito (é um rótulo, não um corpo de texto).
+const MAX_TITLE_LENGTH = 20;

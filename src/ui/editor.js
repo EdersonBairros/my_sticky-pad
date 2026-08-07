@@ -61,6 +61,15 @@ function updateToolbarState() {
 }
 
 /**
+ * Obtém o título digitado (texto puro, já aparado). Vazio se não houver campo.
+ * @returns {string}
+ */
+function getTitleValue() {
+    const input = document.querySelector('.note-title-input');
+    return input ? input.value.trim() : '';
+}
+
+/**
  * Obtém o HTML atual do editor.
  * @returns {string}
  */

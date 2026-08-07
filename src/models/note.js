@@ -11,6 +11,7 @@
  *   - `updatedAt`: data da última EDIÇÃO, usada para ordenar (mais recente no topo).
  *
  * @param {object} [data] - Dados parciais para inicializar a nota
+ * @param {string} [data.title=''] - Título curto da nota (opcional)
  * @param {string} [data.text=''] - Conteúdo HTML da nota
  * @param {string} [data.createdAt] - Data de criação (ISO)
  * @param {string} [data.updatedAt] - Data da última edição (ISO)
@@ -23,6 +24,8 @@ function createNote(data = {}) {
     const createdAt = data.createdAt || now;
     return {
         id: Date.now().toString() + Math.random().toString(36).slice(2, 6),
+        // Título é texto puro e opcional; aparado ao limite (defensivo p/ import).
+        title: typeof data.title === 'string' ? data.title.trim().slice(0, MAX_TITLE_LENGTH) : '',
         text: data.text || '',
         createdAt: createdAt,
         // Notas antigas/importadas sem `updatedAt` herdam o `createdAt` (backfill).

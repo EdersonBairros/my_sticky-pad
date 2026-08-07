@@ -36,6 +36,7 @@ function createNoteElement(note, editingId) {
  */
 function _buildEditingNote(div, note) {
     div.innerHTML = `
+        <input type="text" class="note-title-input" placeholder="Título (opcional)" maxlength="${MAX_TITLE_LENGTH}">
         <div class="format-toolbar">
             <div class="toolbar-group">
                 <button class="format-btn" data-cmd="bold" title="Negrito"><span class="bold-text">B</span></button>
@@ -71,6 +72,10 @@ function _buildEditingNote(div, note) {
     editorWrapper.appendChild(picker);
 
     setTimeout(() => {
+        // Preenche o título via .value (evita injeção via atributo).
+        const titleInput = div.querySelector('.note-title-input');
+        if (titleInput) titleInput.value = note.title || '';
+
         setEditorHTML(note.text);
         const editor = div.querySelector('.note-editor');
         if (!editor) return;
@@ -103,6 +108,7 @@ function _buildViewNote(div, note) {
     div.innerHTML = `
         <button class="color-btn" data-action="color-toggle" title="Alterar cor da nota">🎨</button>
         ${note.category ? `<span class="note-category-badge">${escapeHtml(note.category)}</span>` : ''}
+        ${note.title ? `<div class="note-title">${escapeHtml(note.title)}</div>` : ''}
         <div class="note-text">${sanitizeHtml(note.text || '')}</div>
         <div class="note-date">${formatDate(note.createdAt)}</div>
         <div class="note-actions">

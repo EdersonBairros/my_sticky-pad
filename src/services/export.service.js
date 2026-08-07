@@ -12,9 +12,10 @@
  */
 function buildExportData(notes) {
     return {
-        // v2: notas passaram a ter `updatedAt` além de `createdAt`.
-        // O import continua tolerante a arquivos v1 (faz backfill de updatedAt).
-        version: 2,
+        // v3: notas passaram a ter `title` (opcional), além de `updatedAt` (v2).
+        // O import é tolerante a arquivos v1/v2 (faz backfill de updatedAt e
+        // trata título ausente como vazio).
+        version: 3,
         exportedAt: new Date().toISOString(),
         notes: notes
     };

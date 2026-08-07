@@ -5,6 +5,7 @@ Uma extensão de navegador (Chrome/Firefox Manifest V3) que funciona como um blo
 ## ✨ Funcionalidades
 
 - ✅ Criar, editar e excluir lembretes
+- ✅ **Título por nota** (opcional, até 20 caracteres) — fixa no topo-esquerdo da nota na listagem, em fonte Trebuchet MS negrito
 - ✅ Formatação de texto (negrito, itálico, sublinhado, listas)
 - ✅ Seletor de emojis com categorias e favoritos
 - ✅ Rolagem infinita entre categorias de emoji
@@ -104,12 +105,16 @@ modo que usuários **não perdem notas** ao atualizar.
 
 ## 📅 Modelo de Nota
 
-Campos de data (ver `models/note.js`):
+Campos (ver `models/note.js`):
 
+- `title` → **título** curto e opcional (texto puro, máx. `MAX_TITLE_LENGTH` = 20 chars). Exibido no topo-esquerdo da nota na listagem (fonte Trebuchet MS negrito).
+- `text` → corpo em HTML rico (sanitizado).
 - `createdAt` → data de **criação**, imutável (é a data exibida na nota).
 - `updatedAt` → data da **última edição**, usada para **ordenar** (mais recente no topo).
 
-Notas antigas/importadas sem `updatedAt` fazem *backfill* automático a partir do `createdAt`.
+**Regra de "nota em branco"**: uma nota só é descartada se estiver sem corpo **E** sem título — portanto uma nota só com título é válida e é salva normalmente.
+
+Notas antigas/importadas sem `updatedAt` fazem *backfill* a partir do `createdAt`; sem `title`, tratam o título como vazio (não quebram nada).
 
 ## ⚠️ Limitações conhecidas / Débito técnico
 
@@ -170,3 +175,4 @@ Seguimos **SemVer** (`MAJOR.MINOR.PATCH`). A cada mudança, a versão em
 | **3.1.0** | 🟡 MINOR | Categorias de notas (modal, CRUD, desfazer, badge) + correções de UX |
 | **3.2.0** | 🟡 MINOR | Segurança e limpeza: sanitização XSS (`sanitizeHtml`), migração para `chrome.storage.local` **com migração automática de dados legados** (sem perda para o usuário), CSP explícito no manifest, separação `createdAt`/`updatedAt`, e `confirm()` nativo → modal não-bloqueante |
 | **3.2.1** | 🟢 PATCH | Corrige o bug "Nota em branco": nota nova vira rascunho só em memória (persiste apenas ao salvar com conteúdo), então fechar o popup antes de salvar não deixa mais notas vazias. Inclui limpeza defensiva de notas em branco legadas no carregamento |
+| **3.3.0** | 🟡 MINOR | Título opcional por nota (máx. 20 chars, Trebuchet MS negrito no topo-esquerdo da listagem). Nota é válida com título OU corpo. Retrocompatível: notas antigas sem `title` funcionam normalmente. Export passa a v3 (import tolerante a v1/v2) |

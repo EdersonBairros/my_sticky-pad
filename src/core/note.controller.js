@@ -63,12 +63,14 @@ function startEditing(id) {
             if (prev) {
                 // Sanitiza para limpar qualquer HTML colado antes de persistir.
                 const html = sanitizeHtml(getEditorHTML());
-                if (html === '') {
-                    // Rascunho/nota esvaziada: descarta em vez de gravar em branco
-                    // (mesma regra do salvar/cancelar). Corrige o bug "Nota em branco".
+                const title = getTitleValue();
+                if (html === '' && title === '') {
+                    // Rascunho/nota esvaziada (sem corpo e sem título): descarta em
+                    // vez de gravar em branco. Corrige o bug "Nota em branco".
                     storageRemoveNote(_editingId);
                 } else {
                     prev.text = html;
+                    prev.title = title;
                     prev.updatedAt = new Date().toISOString();
                     storagePersist();
                 }
@@ -93,13 +95,15 @@ function saveEditing(id) {
     const note = getNoteById(id);
     if (!note) return;
 
-    const html = getEditorHTML();
-    if (html === '') {
+    const html = sanitizeHtml(getEditorHTML());
+    const title = getTitleValue();
+    // A nota é válida se tiver corpo OU título. Só descarta se ambos vazios.
+    if (html === '' && title === '') {
         handleDeleteNote(id);
         return;
     }
-    // Sanitiza o HTML antes de persistir (limpa conteúdo colado/importado).
-    note.text = sanitizeHtml(html);
+    note.text = html;
+    note.title = title;
     // Atualiza apenas `updatedAt` — `createdAt` permanece a data real de criação.
     note.updatedAt = new Date().toISOString();
     _editingId = null;
@@ -116,7 +120,9 @@ function saveEditing(id) {
  */
 function handleCancelEditing() {
     const note = getNoteById(_editingId);
-    if (note && note.text === '') {
+    // Descarta apenas se a nota persistida estiver totalmente em branco
+    // (sem corpo E sem título) — caso típico do rascunho recém-criado.
+    if (note && note.text === '' && !note.title) {
         handleDeleteNote(_editingId);
         return;
     }
