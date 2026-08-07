@@ -98,7 +98,8 @@ function handleImport(file, notesContainer) {
                 storageAddNote(createNote({
                     text: n.text,
                     createdAt: n.createdAt,
-                    color: n.color
+                    color: n.color,
+                    category: n.category || null
                 }));
                 added++;
             });

@@ -8,6 +8,7 @@
  * @param {object} [data] - Dados parciais para inicializar a nota
  * @param {string} [data.text=''] - Conteúdo HTML da nota
  * @param {string|null} [data.color=null] - Cor de fundo em hex
+ * @param {string|null} [data.category=null] - Categoria da nota
  * @returns {Note} Nova nota
  */
 function createNote(data = {}) {
@@ -15,7 +16,8 @@ function createNote(data = {}) {
         id: Date.now().toString() + Math.random().toString(36).slice(2, 6),
         text: data.text || '',
         createdAt: data.createdAt || new Date().toISOString(),
-        color: data.color || null
+        color: data.color || null,
+        category: data.category || null
     };
 }
 

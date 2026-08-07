@@ -20,6 +20,7 @@ function bootstrap() {
         renderNotes($.notesContainer, getEditingId());
         updateNoteCount($.noteCount);
     });
+    initCategories();
     initNoteController($.notesContainer, $.noteCount);
     initResize();
 
@@ -39,6 +40,7 @@ function bootstrap() {
     _initToolbarDispatcher($.notesContainer);
     _initEmojiDispatchers($.notesContainer);
     _initGlobalCloseDispatchers();
+    _initCategoryDispatchers($.notesContainer);
     _initEditorEvents();
     _initHexKeyHandler($.notesContainer);
     _initToolbarStateUpdaters($.notesContainer);
@@ -67,6 +69,7 @@ function _initActionDispatcher(container) {
             case 'set-color': if (target.dataset.color) applyColor(id, target.dataset.color); break;
             case 'toggle-custom': _toggleCustomColor(item); break;
             case 'apply-hex': _applyHexInput(item, id); break;
+            case 'category-toggle': openCategoryModal(id, item); break;
         }
     });
 }
@@ -97,10 +100,54 @@ function _initEmojiDispatchers(container) {
     });
 }
 
+function _initCategoryDispatchers(container) {
+    // Seletor de categoria (radio)
+    container.addEventListener('change', e => {
+        const radio = e.target.closest('input[data-action="category-select"]');
+        if (radio) {
+            selectCategory(radio.value);
+        }
+    });
+
+    // Cliques dentro do modal (adicionar, remover, desfazer)
+    container.addEventListener('click', e => {
+        const target = e.target.closest('[data-action]');
+        if (!target) return;
+
+        switch (target.dataset.action) {
+            case 'category-add': {
+                const modal = target.closest('.category-modal');
+                const input = modal ? modal.querySelector('.category-input') : null;
+                if (input) addCategoryFromInput(input);
+                break;
+            }
+            case 'category-remove': {
+                const nameEl = target.closest('.category-option').querySelector('.category-name');
+                if (nameEl) removeCategory(nameEl.textContent);
+                break;
+            }
+            case 'category-undo': {
+                undoRemoveCategory(target.dataset.categoryName);
+                break;
+            }
+        }
+    });
+
+    // Enter no input de categoria
+    container.addEventListener('keydown', e => {
+        const input = e.target.closest('.category-input');
+        if (input && e.key === 'Enter') {
+            e.preventDefault();
+            addCategoryFromInput(input);
+        }
+    });
+}
+
 function _initGlobalCloseDispatchers() {
     document.addEventListener('click', e => {
         if (!e.target.closest('.emoji-picker') && !e.target.closest('.emoji-btn')) closeEmojiPicker();
         if (!e.target.closest('.color-picker-dropdown') && !e.target.closest('.color-btn')) closeColorPickers();
+        if (!e.target.closest('.category-modal') && !e.target.closest('[data-action="category-toggle"]')) closeCategoryModal();
     });
 }
 

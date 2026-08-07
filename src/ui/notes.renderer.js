@@ -60,6 +60,7 @@ function _buildEditingNote(div, note) {
         <div class="edit-actions">
             <button class="save-btn" data-action="save">💾 Salvar</button>
             <button class="cancel-btn" data-action="cancel">❌ Cancelar</button>
+            <button class="category-btn" data-action="category-toggle" title="Categorias">⚙️</button>
         </div>
     `;
 
@@ -96,6 +97,7 @@ function _buildEditingNote(div, note) {
 function _buildViewNote(div, note) {
     div.innerHTML = `
         <button class="color-btn" data-action="color-toggle" title="Alterar cor da nota">🎨</button>
+        ${note.category ? `<span class="note-category-badge">${escapeHtml(note.category)}</span>` : ''}
         <div class="note-text">${note.text || ''}</div>
         <div class="note-date">${formatDate(note.createdAt)}</div>
         <div class="note-actions">
