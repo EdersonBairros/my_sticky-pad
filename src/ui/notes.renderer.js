@@ -97,10 +97,13 @@ function _buildEditingNote(div, note) {
  * @param {object} note
  */
 function _buildViewNote(div, note) {
+    // `note.text` é HTML rico da nota. Passa por sanitizeHtml (whitelist) como
+    // choke point final de XSS — protege inclusive dados persistidos antes da
+    // correção. A data exibida é `createdAt` (data real de criação, imutável).
     div.innerHTML = `
         <button class="color-btn" data-action="color-toggle" title="Alterar cor da nota">🎨</button>
         ${note.category ? `<span class="note-category-badge">${escapeHtml(note.category)}</span>` : ''}
-        <div class="note-text">${note.text || ''}</div>
+        <div class="note-text">${sanitizeHtml(note.text || '')}</div>
         <div class="note-date">${formatDate(note.createdAt)}</div>
         <div class="note-actions">
             <button class="edit-btn" data-action="edit" title="Editar">✏️</button>
@@ -131,7 +134,11 @@ function renderNotes(notesContainer, editingId) {
         return;
     }
 
-    const sorted = [...notes].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    // Ordena pela última edição (mais recente no topo). Notas antigas sem
+    // `updatedAt` caem no `createdAt` (backfill).
+    const sorted = [...notes].sort((a, b) =>
+        new Date(b.updatedAt || b.createdAt) - new Date(a.updatedAt || a.createdAt)
+    );
 
     if (editingId) {
         const idx = sorted.findIndex(n => n.id === editingId);

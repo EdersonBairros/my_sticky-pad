@@ -95,9 +95,11 @@ function handleImport(file, notesContainer) {
                     ? n.id
                     : Date.now().toString() + Math.random().toString(36).slice(2);
                 existingIds.add(id);
+                // Sanitiza o HTML importado (vetor de XSS) e preserva as datas.
                 storageAddNote(createNote({
-                    text: n.text,
+                    text: sanitizeHtml(typeof n.text === 'string' ? n.text : ''),
                     createdAt: n.createdAt,
+                    updatedAt: n.updatedAt,
                     color: n.color,
                     category: n.category || null
                 }));

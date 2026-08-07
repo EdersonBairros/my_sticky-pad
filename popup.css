@@ -1126,6 +1126,76 @@ body {
     transform: scale(1.08);
 }
 
+/* ===== MODAL DE CONFIRMAÇÃO (substitui confirm() nativo) ===== */
+.confirm-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+    padding: 16px;
+}
+
+.confirm-overlay.open {
+    opacity: 1;
+}
+
+.confirm-box {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.25);
+    padding: 16px;
+    max-width: 280px;
+    width: 100%;
+    transform: scale(0.95);
+    transition: transform 0.15s ease;
+}
+
+.confirm-overlay.open .confirm-box {
+    transform: scale(1);
+}
+
+.confirm-message {
+    font-size: 14px;
+    color: #333;
+    line-height: 1.5;
+    margin-bottom: 14px;
+}
+
+.confirm-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+.confirm-actions button {
+    border: none;
+    padding: 6px 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    transition: opacity 0.2s;
+}
+
+.confirm-actions button:hover {
+    opacity: 0.85;
+}
+
+.confirm-cancel {
+    background-color: #e0e0e0;
+    color: #333;
+}
+
+.confirm-ok {
+    background-color: #f44336;
+    color: #fff;
+}
+
 /* ===== SCROLLBAR ===== */
 .notes-container::-webkit-scrollbar {
     width: 6px;

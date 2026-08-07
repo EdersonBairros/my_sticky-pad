@@ -5,15 +5,21 @@
  * @module services/category
  */
 
+/**
+ * @type {string[]} Cache em memória das categorias customizadas.
+ * As leituras (`getAllCategories`, etc.) são síncronas a partir dele;
+ * a carga inicial é assíncrona e a persistência é fire-and-forget.
+ */
 let _customCategories = [];
 
 /**
- * Inicializa o serviço carregando categorias do localStorage.
+ * Inicializa o serviço carregando categorias do armazenamento.
+ * @returns {Promise<void>}
  */
-function initCategories() {
+async function initCategories() {
     try {
-        const data = localStorage.getItem(STORAGE_KEYS.CATEGORIES);
-        _customCategories = data ? JSON.parse(data) : [];
+        const data = await storageGet(STORAGE_KEYS.CATEGORIES);
+        _customCategories = Array.isArray(data) ? data : [];
     } catch (e) {
         _customCategories = [];
     }
@@ -102,8 +108,11 @@ function isCategoryInUse(name) {
 }
 
 /**
- * Persiste as categorias customizadas no localStorage.
+ * Persiste as categorias customizadas (fire-and-forget).
+ * @private
  */
 function _persistCategories() {
-    localStorage.setItem(STORAGE_KEYS.CATEGORIES, JSON.stringify(_customCategories));
+    storageSet(STORAGE_KEYS.CATEGORIES, _customCategories).catch(e =>
+        console.warn('Erro ao salvar categorias:', e)
+    );
 }
