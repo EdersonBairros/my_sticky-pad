@@ -57,7 +57,9 @@ function startEditing(id) {
         if (editor && _editingId) {
             const note = getNoteById(_editingId);
             if (note) {
-                note.text = getEditorHTML();
+                // Sanitiza para limpar qualquer HTML colado antes de persistir.
+                note.text = sanitizeHtml(getEditorHTML());
+                note.updatedAt = new Date().toISOString();
                 storagePersist();
             }
         }
@@ -85,8 +87,10 @@ function saveEditing(id) {
         handleDeleteNote(id);
         return;
     }
-    note.text = html;
-    note.createdAt = new Date().toISOString();
+    // Sanitiza o HTML antes de persistir (limpa conteúdo colado/importado).
+    note.text = sanitizeHtml(html);
+    // Atualiza apenas `updatedAt` — `createdAt` permanece a data real de criação.
+    note.updatedAt = new Date().toISOString();
     _editingId = null;
     _editingOriginalCategory = null;
     _hasCategoryBackup = false;
@@ -116,17 +120,18 @@ function handleCancelEditing() {
 }
 
 /**
- * Limpa todas as notas (com confirmação).
+ * Limpa todas as notas (com confirmação via modal não-bloqueante).
+ * @returns {Promise<void>}
  */
-function handleClearAllNotes() {
+async function handleClearAllNotes() {
     if (getNotes().length === 0) return;
-    if (confirm('Tem certeza que deseja limpar todos os lembretes?')) {
-        storageClearAll();
-        _editingId = null;
-        renderNotes(_notesContainer, _editingId);
-        updateNoteCount(_noteCountElement);
-        showToast('Todas as notas foram removidas.', 'warning');
-    }
+    const confirmed = await showConfirm('Tem certeza que deseja limpar todos os lembretes?');
+    if (!confirmed) return;
+    storageClearAll();
+    _editingId = null;
+    renderNotes(_notesContainer, _editingId);
+    updateNoteCount(_noteCountElement);
+    showToast('Todas as notas foram removidas.', 'warning');
 }
 
 /** @returns {string|null} */

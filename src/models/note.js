@@ -5,17 +5,28 @@
 
 /**
  * Cria uma nova nota com valores padrão.
+ *
+ * Campos de data:
+ *   - `createdAt`: data de CRIAÇÃO, imutável após criada (exibida na nota).
+ *   - `updatedAt`: data da última EDIÇÃO, usada para ordenar (mais recente no topo).
+ *
  * @param {object} [data] - Dados parciais para inicializar a nota
  * @param {string} [data.text=''] - Conteúdo HTML da nota
+ * @param {string} [data.createdAt] - Data de criação (ISO)
+ * @param {string} [data.updatedAt] - Data da última edição (ISO)
  * @param {string|null} [data.color=null] - Cor de fundo em hex
  * @param {string|null} [data.category=null] - Categoria da nota
  * @returns {Note} Nova nota
  */
 function createNote(data = {}) {
+    const now = new Date().toISOString();
+    const createdAt = data.createdAt || now;
     return {
         id: Date.now().toString() + Math.random().toString(36).slice(2, 6),
         text: data.text || '',
-        createdAt: data.createdAt || new Date().toISOString(),
+        createdAt: createdAt,
+        // Notas antigas/importadas sem `updatedAt` herdam o `createdAt` (backfill).
+        updatedAt: data.updatedAt || createdAt,
         color: data.color || null,
         category: data.category || null
     };

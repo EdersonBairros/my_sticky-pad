@@ -11,8 +11,8 @@ Uma extensão de navegador (Chrome/Firefox Manifest V3) que funciona como um blo
 - ✅ Cores personalizadas (predefinidas + gradiente customizado)
 - ✅ Redimensionamento da janela popup arrastando as bordas
 - ✅ Exportar notas para arquivo JSON
-- ✅ Importar notas de arquivo JSON (adiciona às existentes)
-- ✅ Persistência local (localStorage)
+- ✅ Importar notas de arquivo JSON (adiciona às existentes, com sanitização de segurança)
+- ✅ Persistência durável via `chrome.storage.local` (com fallback para `localStorage`)
 - ✅ Modo edição com toolbar de formatação
 - ✅ **Categorias de notas** — organize lembretes por categoria (Trabalho, Escola, Casa + personalizadas)
   - Botão ⚙️ no rodapé da nota em edição
@@ -37,7 +37,7 @@ src/
 ├── models/
 │   └── note.js                → Modelo Note (factory, validação e campo `category`)
 ├── services/
-│   ├── storage.service.js     → Persistência em localStorage (sem acoplamento com UI)
+│   ├── storage.service.js     → Persistência das notas + tamanho do popup (cache em memória)
 │   ├── export.service.js      → Serialização, download e parse de JSON
 │   └── category.service.js    → CRUD de categorias (predefinidas + personalizadas)
 ├── ui/
@@ -52,17 +52,71 @@ src/
 ├── utils/
 │   ├── date.js                → Formatação relativa de datas
 │   ├── color.js               → Utilitários de cor (escurecer, validar hex)
-│   └── dom.js                 → escapeHtml (proteção XSS)
+│   ├── storage.js             → Adaptador chrome.storage.local (async, fallback localStorage)
+│   └── dom.js                 → escapeHtml + sanitizeHtml (proteção XSS)
 ├── index.js                   → Entry point (DOMContentLoaded → bootstrap)
 ```
 
 ### Princípios
 
 - **SRP (Single Responsibility Principle)**: Cada arquivo tem uma única responsabilidade
-- **Baixo acoplamento**: Services não manipulam DOM; UI não acessa localStorage diretamente
+- **Baixo acoplamento**: Services não manipulam DOM; UI não acessa o armazenamento diretamente (usa `utils/storage.js`)
 - **Alta coesão**: Funções relacionadas estão no mesmo módulo
-- **Estado mínimo**: O estado global é gerenciado apenas pelo storage service
-- **Zero alert()**: Substituído por notificações toast não-bloqueantes
+- **Estado mínimo**: O estado global é gerenciado apenas pelos services (caches em memória)
+- **Zero diálogos nativos**: `alert()`/`confirm()` substituídos por toast e modal não-bloqueantes
+
+## 🔒 Segurança (XSS)
+
+As notas guardam **HTML rico** (o editor é `contenteditable`), então o conteúdo
+não pode ser injetado cru via `innerHTML`. Um arquivo importado ou um trecho
+colado poderia conter `<img onerror=...>`, `<script>`, etc.
+
+Proteção via **whitelist** em `utils/dom.js` → `sanitizeHtml()`:
+
+- Mantém apenas tags de formatação (`b, i, u, s, ul, ol, li, div, span, p, ...`)
+- Remove `<script>`, `<iframe>`, `<img>`, handlers `on*`, `src`/`href`, `style` perigoso
+- Aplicada em **3 pontos** (defesa em profundidade): no **import**, no **save** e na **renderização** (choke point final, protege até dados antigos)
+- Reforçada por `content_security_policy` explícito no `manifest.json` (bloqueia scripts/handlers inline)
+
+> Para texto puro (ex.: nome de categoria) usa-se `escapeHtml()`, não `sanitizeHtml()`.
+
+## 💾 Armazenamento
+
+Persistência via **`chrome.storage.local`** (durável — não é apagada pela limpeza
+de "dados de navegação", diferente do `localStorage`). O adaptador `utils/storage.js`
+cai automaticamente para `localStorage` quando a API de extensão não está
+disponível (ex.: abrir `popup.html` direto no navegador para testar).
+
+**Padrão de acesso** (importante para manutenção):
+
+- As funções do adaptador são **assíncronas**.
+- Cada service mantém um **cache em memória**; as **leituras da UI são síncronas** (do cache).
+- Só o **carregamento inicial** (no `bootstrap`, que é `async`) precisa de `await`.
+- As **escritas** são "fire-and-forget": atualizam o cache na hora e persistem em background.
+
+Chaves usadas (ver `core/constants.js`): `postitNotes`, `postitSize`,
+`postitFavoriteEmojis`, `postitCategories`.
+
+**Migração de dados legados**: versões `<= 3.1.0` guardavam tudo em `localStorage`.
+Ao ler uma chave ainda inexistente no `chrome.storage.local`, o adaptador busca o
+valor legado no `localStorage` e o migra automaticamente (uma vez por chave), de
+modo que usuários **não perdem notas** ao atualizar.
+
+## 📅 Modelo de Nota
+
+Campos de data (ver `models/note.js`):
+
+- `createdAt` → data de **criação**, imutável (é a data exibida na nota).
+- `updatedAt` → data da **última edição**, usada para **ordenar** (mais recente no topo).
+
+Notas antigas/importadas sem `updatedAt` fazem *backfill* automático a partir do `createdAt`.
+
+## ⚠️ Limitações conhecidas / Débito técnico
+
+- **`document.execCommand`** (`ui/editor.js`): API de formatação formalmente
+  descontinuada. Mantida por simplicidade (sem dependências); ainda suportada por
+  todos os navegadores atuais. Substituí-la (Selection/Range API ou editor rico)
+  é um refactor maior, planejado para o futuro.
 
 ## 🔄 Fluxo da Aplicação
 
@@ -70,8 +124,8 @@ src/
 1. Usuário abre a extensão (clica no ícone)
 2. popup.html carrega todos os módulos src/ na ordem correta
 3. index.js dispara DOMContentLoaded → bootstrap()
-4. bootstrap() inicializa:
-   - Storage (carrega notas do localStorage)
+4. bootstrap() (async) inicializa:
+   - Storage (await: carrega notas, categorias e favoritos do chrome.storage.local)
    - Note Controller (conecta regras de negócio)
    - Resize (handles de redimensionamento)
    - Options Menu (exportar/importar)
@@ -99,9 +153,19 @@ src/
 
 ##  Versionamento
 
-- **1.0.0** → Versão inicial monolítica
-- **2.0.0** → Primeira refatoração modular
-- **2.1.0** → Favoritos + scroll infinito em emojis
-- **2.2.0** → Novo ícone com gradiente
-- **3.0.0** → Refatoração completa com Clean Architecture
-- **3.1.0** → Feature de Categorias de notas (modal, CRUD, desfazer, badge) + correções de UX
+Seguimos **SemVer** (`MAJOR.MINOR.PATCH`). A cada mudança, a versão em
+`manifest.json` **deve** ser atualizada e o impacto sinalizado abaixo:
+
+- 🔴 **MAJOR** → mudança incompatível (quebra dados/API; exige migração)
+- 🟡 **MINOR** → nova funcionalidade **retrocompatível**
+- 🟢 **PATCH** → correção de bug retrocompatível, sem nova funcionalidade
+
+| Versão | Impacto | Descrição |
+|--------|---------|-----------|
+| **1.0.0** | 🔴 MAJOR | Versão inicial monolítica |
+| **2.0.0** | 🔴 MAJOR | Primeira refatoração modular |
+| **2.1.0** | 🟡 MINOR | Favoritos + scroll infinito em emojis |
+| **2.2.0** | 🟢 PATCH | Novo ícone com gradiente |
+| **3.0.0** | 🔴 MAJOR | Refatoração completa com Clean Architecture |
+| **3.1.0** | 🟡 MINOR | Categorias de notas (modal, CRUD, desfazer, badge) + correções de UX |
+| **3.2.0** | 🟡 MINOR | Segurança e limpeza: sanitização XSS (`sanitizeHtml`), migração para `chrome.storage.local` **com migração automática de dados legados** (sem perda para o usuário), CSP explícito no manifest, separação `createdAt`/`updatedAt`, e `confirm()` nativo → modal não-bloqueante |

@@ -157,21 +157,43 @@ function closeEmojiPicker() {
 // --- Gerenciamento de favoritos ---
 
 /**
- * Obtém a lista de emojis favoritos.
- * @returns {Array}
+ * @type {Array} Cache em memória dos favoritos ({emoji, count}).
+ * Necessário porque `getFavoriteEmojis` é lido de forma SÍNCRONA durante a
+ * renderização do picker, enquanto o armazenamento agora é assíncrono.
  */
-function getFavoriteEmojis() {
+let _favoriteEmojis = [];
+
+/**
+ * Carrega os favoritos do armazenamento para o cache. Deve ser aguardado no
+ * bootstrap antes da primeira abertura do picker.
+ * @returns {Promise<void>}
+ */
+async function initFavoriteEmojis() {
     try {
-        return JSON.parse(localStorage.getItem(STORAGE_KEYS.FAVORITE_EMOJIS)) || [];
-    } catch (e) { return []; }
+        const data = await storageGet(STORAGE_KEYS.FAVORITE_EMOJIS);
+        _favoriteEmojis = Array.isArray(data) ? data : [];
+    } catch (e) {
+        _favoriteEmojis = [];
+    }
 }
 
 /**
- * Salva a lista de favoritos.
+ * Obtém a lista de emojis favoritos (do cache, síncrono).
+ * @returns {Array}
+ */
+function getFavoriteEmojis() {
+    return _favoriteEmojis;
+}
+
+/**
+ * Salva a lista de favoritos (atualiza o cache e persiste fire-and-forget).
  * @param {Array} favorites
  */
 function saveFavoriteEmojis(favorites) {
-    localStorage.setItem(STORAGE_KEYS.FAVORITE_EMOJIS, JSON.stringify(favorites));
+    _favoriteEmojis = favorites;
+    storageSet(STORAGE_KEYS.FAVORITE_EMOJIS, favorites).catch(e =>
+        console.warn('Erro ao salvar favoritos:', e)
+    );
 }
 
 /**

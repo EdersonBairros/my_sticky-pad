@@ -3,7 +3,7 @@
  * @module core/app
  */
 
-function bootstrap() {
+async function bootstrap() {
     const $ = {
         notesContainer: document.getElementById('notesContainer'),
         addNoteBtn: document.getElementById('addNoteBtn'),
@@ -16,11 +16,15 @@ function bootstrap() {
         noteCount: document.getElementById('noteCount')
     };
 
-    initStorage(() => {
+    // O armazenamento agora é assíncrono (chrome.storage.local). Aguardamos as
+    // cargas antes de renderizar para que os caches em memória estejam prontos.
+    await initStorage(() => {
         renderNotes($.notesContainer, getEditingId());
         updateNoteCount($.noteCount);
     });
-    initCategories();
+    await initCategories();
+    await initFavoriteEmojis();
+
     initNoteController($.notesContainer, $.noteCount);
     initResize();
 

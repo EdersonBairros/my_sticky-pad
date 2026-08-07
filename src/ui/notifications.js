@@ -49,3 +49,54 @@ function showToast(message, type) {
         setTimeout(() => toast.remove(), 300);
     }, TOAST_DURATION);
 }
+
+/**
+ * Exibe um diálogo de confirmação não-bloqueante (substitui o `confirm()`
+ * nativo, mantendo o princípio "Zero diálogos nativos" do projeto).
+ * @param {string} message - Pergunta a confirmar
+ * @param {object} [opts]
+ * @param {string} [opts.confirmText='Confirmar']
+ * @param {string} [opts.cancelText='Cancelar']
+ * @returns {Promise<boolean>} Resolve `true` se confirmado, `false` caso contrário
+ */
+function showConfirm(message, opts = {}) {
+    const confirmText = opts.confirmText || 'Confirmar';
+    const cancelText = opts.cancelText || 'Cancelar';
+
+    return new Promise(resolve => {
+        const overlay = document.createElement('div');
+        overlay.className = 'confirm-overlay';
+        overlay.innerHTML = `
+            <div class="confirm-box" role="dialog" aria-modal="true">
+                <p class="confirm-message"></p>
+                <div class="confirm-actions">
+                    <button class="confirm-cancel">${cancelText}</button>
+                    <button class="confirm-ok">${confirmText}</button>
+                </div>
+            </div>
+        `;
+        // Mensagem via textContent (evita injeção de HTML).
+        overlay.querySelector('.confirm-message').textContent = message;
+        document.body.appendChild(overlay);
+
+        /** Fecha o diálogo e resolve a Promise. */
+        const close = result => {
+            document.removeEventListener('keydown', onKey);
+            overlay.remove();
+            resolve(result);
+        };
+        const onKey = e => {
+            if (e.key === 'Escape') close(false);
+            if (e.key === 'Enter') close(true);
+        };
+
+        overlay.querySelector('.confirm-ok').addEventListener('click', () => close(true));
+        overlay.querySelector('.confirm-cancel').addEventListener('click', () => close(false));
+        // Clicar fora da caixa cancela.
+        overlay.addEventListener('click', e => { if (e.target === overlay) close(false); });
+        document.addEventListener('keydown', onKey);
+
+        requestAnimationFrame(() => overlay.classList.add('open'));
+        overlay.querySelector('.confirm-ok').focus();
+    });
+}

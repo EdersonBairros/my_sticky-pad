@@ -29,6 +29,13 @@ const FORMAT_STATE_MAP = Object.freeze({
 
 /**
  * Executa um comando de formatação no editor ativo.
+ *
+ * DÉBITO TÉCNICO CONHECIDO: `document.execCommand` está formalmente descontinuado
+ * (deprecated). Ainda é suportado por todos os navegadores atuais e é a forma
+ * mais simples de formatar `contenteditable` sem bibliotecas. A substituição
+ * (Selection/Range API ou um editor rico) é um refactor grande, fora do escopo
+ * atual. A saída dele é sanitizada por `sanitizeHtml` antes de ser persistida.
+ *
  * @param {string} command - Nome do comando document.execCommand
  */
 function execFormat(command) {
