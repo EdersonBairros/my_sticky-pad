@@ -40,27 +40,15 @@ function _persist() {
 
 function getNotes() { return _notes; }
 
-function setNotes(newNotes) { _notes = newNotes; _persist(); }
-
 function getNoteById(id) { return _notes.find(n => n.id === id); }
 
 function storageAddNote(note) { _notes.unshift(note); _persist(); }
 
 function storageRemoveNote(id) { _notes = _notes.filter(n => n.id !== id); _persist(); }
 
-function storageUpdateNote(id, updates) {
-    const note = _notes.find(n => n.id === id);
-    if (note) { Object.assign(note, updates); _persist(); }
-}
-
 function storagePersist() { _persist(); }
 
 function storageClearAll() { _notes = []; _persist(); }
-
-function updateNote(id, updates) {
-    const note = _notes.find(n => n.id === id);
-    if (note) { Object.assign(note, updates); storagePersist(); }
-}
 
 function loadPopupSize() {
     try {

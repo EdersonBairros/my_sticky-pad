@@ -6,7 +6,8 @@
 const STORAGE_KEYS = Object.freeze({
     NOTES: 'postitNotes',
     SIZE: 'postitSize',
-    FAVORITE_EMOJIS: 'postitFavoriteEmojis'
+    FAVORITE_EMOJIS: 'postitFavoriteEmojis',
+    CATEGORIES: 'postitCategories'
 });
 
 const RESIZE_LIMITS = Object.freeze({
@@ -24,3 +25,7 @@ const PRESET_COLORS = Object.freeze([
 ]);
 
 const MAX_FAVORITE_EMOJIS = 24;
+
+const PREDEFINED_CATEGORIES = Object.freeze(['Trabalho', 'Escola', 'Casa']);
+const MAX_CUSTOM_CATEGORIES = 5;
+const MAX_CUSTOM_CATEGORIES_LENGTH = 15;
