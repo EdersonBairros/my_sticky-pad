@@ -169,3 +169,4 @@ Seguimos **SemVer** (`MAJOR.MINOR.PATCH`). A cada mudança, a versão em
 | **3.0.0** | 🔴 MAJOR | Refatoração completa com Clean Architecture |
 | **3.1.0** | 🟡 MINOR | Categorias de notas (modal, CRUD, desfazer, badge) + correções de UX |
 | **3.2.0** | 🟡 MINOR | Segurança e limpeza: sanitização XSS (`sanitizeHtml`), migração para `chrome.storage.local` **com migração automática de dados legados** (sem perda para o usuário), CSP explícito no manifest, separação `createdAt`/`updatedAt`, e `confirm()` nativo → modal não-bloqueante |
+| **3.2.1** | 🟢 PATCH | Corrige o bug "Nota em branco": nota nova vira rascunho só em memória (persiste apenas ao salvar com conteúdo), então fechar o popup antes de salvar não deixa mais notas vazias. Inclui limpeza defensiva de notas em branco legadas no carregamento |
