@@ -78,7 +78,10 @@ function storageAddDraftNote(note) { _notes.unshift(note); }
  */
 function pruneBlankNotes() {
     const before = _notes.length;
-    _notes = _notes.filter(n => n && typeof n.text === 'string' && n.text.trim() !== '');
+    // Uma nota é "em branco" só se NÃO tiver corpo E NÃO tiver título.
+    const hasText = n => typeof n.text === 'string' && n.text.trim() !== '';
+    const hasTitle = n => typeof n.title === 'string' && n.title.trim() !== '';
+    _notes = _notes.filter(n => n && (hasText(n) || hasTitle(n)));
     const removed = before - _notes.length;
     if (removed > 0) _persist();
     return removed;
