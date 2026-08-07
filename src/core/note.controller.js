@@ -30,7 +30,10 @@ function initNoteController(notesContainer, noteCountElement) {
 function handleAddNote() {
     if (_editingId) handleCancelEditing();
     const note = createNote();
-    storageAddNote(note);
+    // Rascunho: fica só em memória. Só é persistido no `saveEditing`, quando
+    // tiver conteúdo. Evita que uma nota em branco fique gravada caso o popup
+    // feche antes de salvar (bug "Nota em branco").
+    storageAddDraftNote(note);
     _editingId = note.id;
     renderNotes(_notesContainer, _editingId);
     updateNoteCount(_noteCountElement);
@@ -52,15 +55,23 @@ function handleDeleteNote(id) {
  * @param {string} id
  */
 function startEditing(id) {
-    if (_editingId) {
+    // Ao trocar de nota em edição, confirma o conteúdo da anterior.
+    if (_editingId && _editingId !== id) {
         const editor = document.querySelector('.note-editor');
-        if (editor && _editingId) {
-            const note = getNoteById(_editingId);
-            if (note) {
+        if (editor) {
+            const prev = getNoteById(_editingId);
+            if (prev) {
                 // Sanitiza para limpar qualquer HTML colado antes de persistir.
-                note.text = sanitizeHtml(getEditorHTML());
-                note.updatedAt = new Date().toISOString();
-                storagePersist();
+                const html = sanitizeHtml(getEditorHTML());
+                if (html === '') {
+                    // Rascunho/nota esvaziada: descarta em vez de gravar em branco
+                    // (mesma regra do salvar/cancelar). Corrige o bug "Nota em branco".
+                    storageRemoveNote(_editingId);
+                } else {
+                    prev.text = html;
+                    prev.updatedAt = new Date().toISOString();
+                    storagePersist();
+                }
             }
         }
     }

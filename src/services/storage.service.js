@@ -58,6 +58,32 @@ function getNoteById(id) { return _notes.find(n => n.id === id); }
 
 function storageAddNote(note) { _notes.unshift(note); _persist(); }
 
+/**
+ * Adiciona uma nota apenas ao CACHE em memória, SEM persistir.
+ *
+ * Usado para a nota "rascunho" recém-criada (ainda em branco). Ela só é
+ * gravada no armazenamento quando ganha conteúdo (no `saveEditing`). Assim, se
+ * o popup for fechado antes de salvar (ex.: clicar fora da extensão), a nota em
+ * branco não fica persistida. Corrige o bug "Nota em branco".
+ * @param {object} note
+ */
+function storageAddDraftNote(note) { _notes.unshift(note); }
+
+/**
+ * Remove do cache (e persiste, se houve remoção) notas em branco.
+ *
+ * Defesa em profundidade: limpa notas vazias que possam ter sido gravadas por
+ * versões anteriores ao fix do bug "Nota em branco".
+ * @returns {number} Quantidade de notas removidas
+ */
+function pruneBlankNotes() {
+    const before = _notes.length;
+    _notes = _notes.filter(n => n && typeof n.text === 'string' && n.text.trim() !== '');
+    const removed = before - _notes.length;
+    if (removed > 0) _persist();
+    return removed;
+}
+
 function storageRemoveNote(id) { _notes = _notes.filter(n => n.id !== id); _persist(); }
 
 function storagePersist() { _persist(); }

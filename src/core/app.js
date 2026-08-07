@@ -25,6 +25,10 @@ async function bootstrap() {
     await initCategories();
     await initFavoriteEmojis();
 
+    // Limpeza defensiva: remove notas em branco herdadas de versões anteriores
+    // ao fix do bug "Nota em branco".
+    pruneBlankNotes();
+
     initNoteController($.notesContainer, $.noteCount);
     initResize();
 
