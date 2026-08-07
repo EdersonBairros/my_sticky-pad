@@ -25,10 +25,11 @@
     --fs-caption: 12px;
     --fs-micro: 11px;
 
-    /* Pesos (só três — regular, médio, semibold) */
+    /* Pesos — regular, médio, semibold e negrito (ênfase) */
     --fw-regular: 400;
     --fw-medium: 500;
     --fw-semibold: 600;
+    --fw-bold: 700;
 
     /* Entrelinha e espaçamento entre letras */
     --lh-body: 1.55;
@@ -224,7 +225,7 @@ body {
     background: none;
     padding: 8px 10px;
     font-size: var(--fs-ui);
-    font-weight: var(--fw-medium);
+    font-weight: var(--fw-bold);
     color: var(--text-primary);
     border-radius: 4px;
     cursor: pointer;
@@ -576,6 +577,18 @@ body {
 }
 
 /* ===== DATA E AÇÕES ===== */
+/*
+ * Rodapé da nota: data fixada na borda inferior-esquerda e ações (editar/
+ * excluir) na direita, na mesma linha — leitura mais organizada.
+ */
+.note-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 8px;
+}
+
 .note-date {
     font-size: var(--fs-micro);
     color: var(--text-muted);
@@ -585,7 +598,6 @@ body {
 .note-actions {
     display: flex;
     gap: 6px;
-    margin-top: 8px;
     justify-content: flex-end;
 }
 
@@ -1208,7 +1220,7 @@ body {
     background: none;
     color: #f44336;
     font-size: var(--fs-caption);
-    font-weight: var(--fw-medium);
+    font-weight: var(--fw-bold);
     cursor: pointer;
     padding: 4px 8px;
     border-radius: 4px;
