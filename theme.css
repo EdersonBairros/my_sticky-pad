@@ -125,8 +125,11 @@
     --shadow-archived: 0 2px 8px rgba(0, 0, 0, 0.14);
     --shadow-dropdown: 0 4px 12px rgba(0, 0, 0, 0.15);
     --shadow-modal: 0 6px 24px rgba(0, 0, 0, 0.25);
-    /* Sombra interna na borda inferior da extensão (profundidade no limite). */
-    --bottom-edge-shadow: inset 0 -7px 6px -6px rgba(0, 0, 0, 0.18);
+    /* Sombra nas bordas internas das barras fixas (cabeçalho/rodapé): dá o efeito
+       das notas passando POR BAIXO delas ao rolar. Spread negativo mantém a
+       sombra contida, sem espalhar pras laterais. */
+    --header-edge-shadow: 0 7px 8px -5px rgba(0, 0, 0, 0.14);
+    --footer-edge-shadow: 0 -7px 8px -5px rgba(0, 0, 0, 0.14);
 
     /* Diversos */
     --overlay-bg: rgba(0, 0, 0, 0.35);
@@ -192,8 +195,9 @@
     --shadow-archived: 0 2px 8px rgba(0, 0, 0, 0.55);
     --shadow-dropdown: 0 4px 14px rgba(0, 0, 0, 0.6);
     --shadow-modal: 0 6px 26px rgba(0, 0, 0, 0.7);
-    /* Sombra interna na borda inferior: mais forte pra aparecer sobre o degradê. */
-    --bottom-edge-shadow: inset 0 -7px 8px -6px rgba(0, 0, 0, 0.55);
+    /* Sombra das bordas das barras fixas (mais forte pra aparecer sobre o degradê). */
+    --header-edge-shadow: 0 7px 8px -5px rgba(0, 0, 0, 0.5);
+    --footer-edge-shadow: 0 -7px 8px -5px rgba(0, 0, 0, 0.5);
 
     /* Diversos */
     --overlay-bg: rgba(0, 0, 0, 0.6);

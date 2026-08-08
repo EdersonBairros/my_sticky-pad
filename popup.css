@@ -10,8 +10,19 @@
     box-sizing: border-box;
 }
 
+/* Impede scroll no nível do documento/janela: SÓ a lista (.notes-container) rola.
+   Sem isto, quando o body ficava mais alto que o teto do popup, o cabeçalho e o
+   rodapé rolavam junto e "sumiam". */
+html {
+    overflow: hidden;
+}
+
 body {
     width: 350px;
+    /* Altura padrão (1ª abertura, sem tamanho salvo): garante que o body tenha
+       altura limitada, pra .notes-container rolar internamente com as barras
+       fixas. O resize sobrescreve via style inline. */
+    height: 500px;
     min-width: 250px;
     min-height: 200px;
     font-family: var(--font-ui);
@@ -28,10 +39,6 @@ body {
     height: 100%;
     min-height: 200px;
     position: relative;
-    /* Sombra interna na borda INFERIOR da extensão: efeito sutil de profundidade
-       no limite da janela (as notas parecem se esconder ao chegar na borda).
-       Fica atrás do conteúdo do rodapé, que continua nítido por cima. */
-    box-shadow: var(--bottom-edge-shadow);
 }
 
 /* ===== RESIZE HANDLES ===== */
@@ -102,6 +109,11 @@ body {
     align-items: center;
     border-bottom: none;
     flex-shrink: 0;
+    /* Acima da lista + sombra na borda de baixo: as notas passam por baixo do
+       cabeçalho ao rolar (profundidade nas barras fixas). */
+    position: relative;
+    z-index: 2;
+    box-shadow: var(--header-edge-shadow);
 }
 
 .header h1 {
@@ -1343,6 +1355,10 @@ body {
     background-color: transparent;
     flex-shrink: 0;
     gap: 8px;
+    /* Acima da lista + sombra na borda de cima (simétrico ao cabeçalho). */
+    position: relative;
+    z-index: 2;
+    box-shadow: var(--footer-edge-shadow);
 }
 
 .note-count {

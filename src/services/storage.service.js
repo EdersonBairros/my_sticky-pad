@@ -120,8 +120,10 @@ async function loadPopupSize() {
     try {
         const size = await storageGet(STORAGE_KEYS.SIZE);
         if (size && size.width && size.height) {
-            document.body.style.width = size.width + 'px';
-            document.body.style.height = size.height + 'px';
+            // Aplica via setPopupSize (que clampa aos RESIZE_LIMITS). Importante:
+            // corrige tamanhos salvos antigos maiores que o teto do popup, que
+            // deixavam o rodape cortado / faziam a janela rolar.
+            setPopupSize(size.width, size.height);
         }
     } catch (e) { /* tamanho é opcional; ignora falhas */ }
 }
