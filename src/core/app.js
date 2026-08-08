@@ -13,7 +13,9 @@ async function bootstrap() {
         exportMenuItem: document.getElementById('exportMenuItem'),
         importMenuItem: document.getElementById('importMenuItem'),
         importFileInput: document.getElementById('importFileInput'),
-        noteCount: document.getElementById('noteCount')
+        noteCount: document.getElementById('noteCount'),
+        searchInput: document.getElementById('searchInput'),
+        searchClearBtn: document.getElementById('searchClearBtn')
     };
 
     // O armazenamento agora é assíncrono (chrome.storage.local). Aguardamos as
@@ -38,6 +40,12 @@ async function bootstrap() {
         exportMenuItem: $.exportMenuItem,
         importMenuItem: $.importMenuItem,
         importFileInput: $.importFileInput,
+        notesContainer: $.notesContainer
+    });
+
+    initSearch({
+        input: $.searchInput,
+        clearBtn: $.searchClearBtn,
         notesContainer: $.notesContainer
     });
 

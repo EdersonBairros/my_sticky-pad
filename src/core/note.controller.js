@@ -44,7 +44,12 @@ function handleAddNote() {
  * @param {string} id
  */
 function handleDeleteNote(id) {
-    if (_editingId === id) _editingId = null;
+    if (_editingId === id) {
+        _editingId = null;
+    } else if (_editingId) {
+        // Excluindo OUTRA nota enquanto edito: preserva o que está sendo digitado.
+        syncEditingDraft();
+    }
     storageRemoveNote(id);
     renderNotes(_notesContainer, _editingId);
     updateNoteCount(_noteCountElement);
@@ -186,7 +191,7 @@ function togglePin(id) {
 
     // Na listagem: deixa o "cravar" tocar e reordena com transição suave (FLIP).
     setTimeout(() => {
-        if (_editingId && _editingId !== id) _syncEditingContent();
+        syncEditingDraft(); // preserva a nota em edição (se houver) antes do render
         const before = _capturePositions(_notesContainer);
         renderNotes(_notesContainer, _editingId);
         _playReorder(_notesContainer, before);
@@ -268,17 +273,22 @@ function _playReorder(container, before) {
 }
 
 /**
- * Sincroniza o conteúdo em digitação da nota em edição para o modelo, para não
- * perdê-lo quando uma re-renderização é disparada por outra ação (ex.: pin).
- * @private
+ * Sincroniza o conteúdo LIVE do editor (texto + título) para o modelo em
+ * memória, para NÃO perder o que está sendo digitado quando uma
+ * re-renderização reconstrói o editor (ex.: busca, remoção de outra nota, pin).
+ *
+ * Atualiza sempre o modelo em memória (é o que o re-render lê para reconstruir
+ * o editor) e persiste em SILÊNCIO apenas se houver conteúdo — um rascunho em
+ * branco não é gravado (mantém o fix do bug "nota em branco").
  */
-function _syncEditingContent() {
-    const editing = getNoteById(_editingId);
-    if (!editing) return;
-    if (!document.querySelector('.note-editor')) return;
-    editing.text = sanitizeHtml(getEditorHTML());
-    editing.title = getTitleValue();
-    storagePersist();
+function syncEditingDraft() {
+    if (!_editingId) return;
+    const note = getNoteById(_editingId);
+    if (!note) return;
+    if (!document.querySelector('.note-editor')) return; // não está editando no DOM
+    note.text = sanitizeHtml(getEditorHTML());
+    note.title = getTitleValue();
+    if (note.text !== '' || note.title !== '') storagePersistSilent();
 }
 
 /** @returns {string|null} */

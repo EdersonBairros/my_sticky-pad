@@ -149,3 +149,89 @@ function _unwrap(el) {
     while (el.firstChild) parent.insertBefore(el.firstChild, el);
     parent.removeChild(el);
 }
+
+/*
+ * ============================================================================
+ * BUSCA (normalização, regex sem acento e grifo)
+ * ============================================================================
+ */
+
+/**
+ * Normaliza texto para busca: remove acentos e coloca em minúsculas.
+ * Assim "Café" e "cafe" casam entre si.
+ * @param {string} s
+ * @returns {string}
+ */
+function normalizeForSearch(s) {
+    const nfd = (s || '').normalize('NFD');
+    let out = '';
+    for (const ch of nfd) {
+        const code = ch.codePointAt(0);
+        // Ignora marcas combinantes (acentos) no intervalo U+0300–U+036F.
+        if (code >= 0x0300 && code <= 0x036f) continue;
+        out += ch;
+    }
+    return out.toLowerCase();
+}
+
+/** Classes de caracteres para casar letras com/sem acento no grifo. */
+const _ACCENT_CLASSES = {
+    a: 'aàáâãä', e: 'eèéêë', i: 'iìíîï',
+    o: 'oòóôõö', u: 'uùúûü', c: 'cç', n: 'nñ'
+};
+
+/**
+ * Monta um regex (case- e acento-insensível) para grifar o termo buscado.
+ * @param {string} term
+ * @returns {RegExp|null} Regex global, ou null se termo vazio
+ */
+function buildSearchRegex(term) {
+    const base = normalizeForSearch(term);
+    if (!base) return null;
+    const pattern = [...base].map(ch => {
+        if (_ACCENT_CLASSES[ch]) {
+            const set = _ACCENT_CLASSES[ch];
+            return `[${set}${set.toUpperCase()}]`;
+        }
+        return ch.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }).join('');
+    return new RegExp(pattern, 'gi');
+}
+
+/**
+ * Grifa (envolve em <mark class="search-hl">) as ocorrências do termo dentro
+ * dos nós de TEXTO de `root` — preserva as tags de formatação e não reparseia
+ * HTML (o texto casado vira `textContent`, sem risco de injeção).
+ * @param {HTMLElement} root
+ * @param {string} term
+ */
+function highlightMatches(root, term) {
+    const regex = buildSearchRegex(term);
+    if (!regex || !root) return;
+
+    const textNodes = [];
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null);
+    let node;
+    while ((node = walker.nextNode())) textNodes.push(node);
+
+    textNodes.forEach(textNode => {
+        const text = textNode.nodeValue;
+        regex.lastIndex = 0;
+        if (!regex.test(text)) return;
+
+        regex.lastIndex = 0;
+        const frag = document.createDocumentFragment();
+        let last = 0, m;
+        while ((m = regex.exec(text)) !== null) {
+            if (m.index > last) frag.appendChild(document.createTextNode(text.slice(last, m.index)));
+            const mark = document.createElement('mark');
+            mark.className = 'search-hl';
+            mark.textContent = m[0];
+            frag.appendChild(mark);
+            last = m.index + m[0].length;
+            if (m[0].length === 0) regex.lastIndex++; // evita loop em match vazio
+        }
+        if (last < text.length) frag.appendChild(document.createTextNode(text.slice(last)));
+        textNode.parentNode.replaceChild(frag, textNode);
+    });
+}

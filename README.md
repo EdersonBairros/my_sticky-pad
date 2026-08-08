@@ -5,8 +5,9 @@ Uma extensão de navegador (Chrome/Firefox Manifest V3) que funciona como um blo
 ## ✨ Funcionalidades
 
 - ✅ Criar, editar e excluir lembretes
-- ✅ **Título por nota** (opcional, até 20 caracteres) — fixa no topo-esquerdo da nota na listagem, com hierarquia tipográfica (Segoe UI semibold)
+- ✅ **Título por nota** (opcional, até 25 caracteres) — fixa no topo-esquerdo da nota na listagem, com hierarquia tipográfica (Segoe UI semibold)
 - ✅ **Fixar notas (pin)** — alfinete no topo-esquerdo (e ao lado do Salvar na edição); notas fixadas sobem para o topo (mais recente fixada primeiro), com sombra de destaque e efeito de "cravar"
+- ✅ **Filtro de busca** — campo no rodapé (live search com debounce de 300ms) que filtra por título, categoria e corpo; sem acento/maiúsculas ("café" = "cafe"), grifa o termo encontrado e respeita a ordem das notas fixadas
 - ✅ Formatação de texto (negrito, itálico, sublinhado, listas)
 - ✅ Seletor de emojis com categorias e favoritos
 - ✅ Rolagem infinita entre categorias de emoji
@@ -108,7 +109,7 @@ modo que usuários **não perdem notas** ao atualizar.
 
 Campos (ver `models/note.js`):
 
-- `title` → **título** curto e opcional (texto puro, máx. `MAX_TITLE_LENGTH` = 20 chars). Exibido no topo-esquerdo da nota na listagem (Segoe UI semibold, 16px — ver Sistema tipográfico).
+- `title` → **título** curto e opcional (texto puro, máx. `MAX_TITLE_LENGTH` = 25 chars). Exibido no topo-esquerdo da nota na listagem (Segoe UI semibold, 16px — ver Sistema tipográfico).
 - `text` → corpo em HTML rico (sanitizado).
 - `createdAt` → data de **criação**, imutável (é a data exibida na nota).
 - `updatedAt` → data da **última edição**.
@@ -203,3 +204,4 @@ Seguimos **SemVer** (`MAJOR.MINOR.PATCH`). A cada mudança, a versão em
 | **3.3.1** | 🟢 PATCH | Sistema tipográfico unificado: família única (Segoe UI) com hierarquia por tamanho/peso/cor/espaçamento, aplicado a todas as superfícies (cabeçalho, notas, inputs, botões, menus, alertas, radios). Título da nota migra de Trebuchet MS para Segoe UI semibold. Ajustes de UX: negrito em Exportar/Importar e "Limpar tudo", mensagem de limpar encurtada ("Limpar todos os lembretes?"), e data reposicionada no rodapé da nota (borda inferior-esquerda). Sem mudança de comportamento |
 | **3.3.2** | 🟢 PATCH | Corrige regressão da 3.3.1: o botão ✓ de criar categoria transbordava para fora da modal (o input, com fonte 13px, não encolhia no flex). Adicionado `min-width: 0` no `.category-input` |
 | **3.4.0** | 🟡 MINOR | Fixar notas (pin): campos `pinned`/`pinnedAt`, ordenação com fixadas no topo (mais recente fixada primeiro), botão de alfinete na listagem (topo-esquerdo do título) e na edição (ao lado do Salvar), sombra de destaque na nota fixada e animação de "cravar". Export → v4 (import tolerante a v1–v3). Retrocompatível com notas sem `pinned` |
+| **3.5.0** | 🟡 MINOR | Filtro de busca no rodapé: live search com debounce de 300ms sobre título/categoria/corpo, case- e acento-insensível, grifo do termo (verde), botão "X" para limpar, estado vazio "Nenhuma nota encontrada", respeitando a ordem das fixadas e com surgimento suave. Limite do título 20 → 25 caracteres |

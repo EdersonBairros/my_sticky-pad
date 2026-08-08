@@ -137,15 +137,47 @@ function _buildViewNote(div, note) {
  */
 function renderNotes(notesContainer, editingId) {
     notesContainer.innerHTML = '';
-    const notes = getNotes();
+    const allNotes = getNotes();
 
-    if (notes.length === 0) {
+    if (allNotes.length === 0) {
         notesContainer.innerHTML = `
             <div class="empty-state">
                 <div class="empty-icon">📋</div>
                 <p>Nenhum lembrete ainda.<br>Clique no <strong>+</strong> para adicionar!</p>
             </div>
         `;
+        return;
+    }
+
+    // Filtro de busca (case- e acento-insensível) em título, categoria e corpo.
+    // A nota em edição sempre aparece, para não sumir enquanto está sendo escrita.
+    const term = (typeof getSearchTerm === 'function') ? getSearchTerm() : '';
+    let notes = allNotes;
+    if (term) {
+        const nterm = normalizeForSearch(term);
+        notes = allNotes.filter(n => n.id === editingId || _noteMatches(n, nterm));
+    }
+
+    if (notes.length === 0) {
+        // Construído via DOM com textContent: o termo do usuário é tratado como
+        // TEXTO puro (impossível injetar HTML/script por construção).
+        const empty = document.createElement('div');
+        empty.className = 'empty-state';
+
+        const icon = document.createElement('div');
+        icon.className = 'empty-icon';
+        icon.textContent = '🔍';
+
+        const p = document.createElement('p');
+        p.appendChild(document.createTextNode('Nenhuma nota encontrada para o termo'));
+        p.appendChild(document.createElement('br'));
+        const strong = document.createElement('strong');
+        strong.textContent = `"${term}"`;
+        p.appendChild(strong);
+
+        empty.appendChild(icon);
+        empty.appendChild(p);
+        notesContainer.appendChild(empty);
         return;
     }
 
@@ -168,7 +200,48 @@ function renderNotes(notesContainer, editingId) {
     }
 
     sorted.forEach(note => {
-        notesContainer.appendChild(createNoteElement(note, editingId));
+        const el = createNoteElement(note, editingId);
+        notesContainer.appendChild(el);
+        // Grifa o termo (só nas notas em visualização; a nota em edição não).
+        if (term && note.id !== editingId) _highlightNote(el, term);
+    });
+}
+
+/**
+ * Verifica se a nota casa com o termo (já normalizado) em título/categoria/corpo.
+ * @private
+ * @param {object} note
+ * @param {string} nterm - Termo já normalizado (sem acento, minúsculo)
+ * @returns {boolean}
+ */
+function _noteMatches(note, nterm) {
+    return normalizeForSearch(note.title || '').includes(nterm)
+        || normalizeForSearch(note.category || '').includes(nterm)
+        || normalizeForSearch(_htmlToText(note.text || '')).includes(nterm);
+}
+
+/**
+ * Extrai o texto visível de um HTML (para buscar no corpo sem casar com tags).
+ * @private
+ * @param {string} html
+ * @returns {string}
+ */
+function _htmlToText(html) {
+    const div = document.createElement('div');
+    div.innerHTML = html;
+    return div.textContent || '';
+}
+
+/**
+ * Grifa o termo no título, badge de categoria e corpo do elemento da nota.
+ * @private
+ * @param {HTMLElement} el
+ * @param {string} term
+ */
+function _highlightNote(el, term) {
+    ['.note-title', '.note-category-badge', '.note-text'].forEach(sel => {
+        const target = el.querySelector(sel);
+        if (target) highlightMatches(target, term);
     });
 }
 

@@ -31,4 +31,7 @@ const MAX_CUSTOM_CATEGORIES = 5;
 const MAX_CUSTOM_CATEGORIES_LENGTH = 15;
 
 // Título da nota: curto de propósito (é um rótulo, não um corpo de texto).
-const MAX_TITLE_LENGTH = 20;
+const MAX_TITLE_LENGTH = 25;
+
+// Campo de busca: limita para não quebrar o layout do rodapé.
+const MAX_SEARCH_LENGTH = 30;

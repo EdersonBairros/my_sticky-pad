@@ -36,6 +36,10 @@
         </div>
         <div class="footer">
             <span id="noteCount" class="note-count">0 lembretes</span>
+            <div class="search-wrap">
+                <input type="text" id="searchInput" class="search-input" placeholder="Buscar notas ou Categorias..." maxlength="30" size="30" autocomplete="off">
+                <button id="searchClearBtn" class="search-clear" title="Limpar busca" aria-label="Limpar busca">✕</button>
+            </div>
             <button id="clearAllBtn" class="clear-btn" title="Limpar todos os lembretes">🗑️ Limpar tudo</button>
         </div>
     </div>
@@ -56,6 +60,7 @@
     <script src="src/ui/color-picker.js"></script>
     <script src="src/ui/category-picker.js"></script>
     <script src="src/ui/notes.renderer.js"></script>
+    <script src="src/ui/search.js"></script>
     <script src="src/ui/options-menu.js"></script>
     <script src="src/core/note.controller.js"></script>
     <script src="src/core/app.js"></script>
