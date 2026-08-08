@@ -1276,15 +1276,96 @@ body {
     padding: 10px 16px;
     border-top: 1px solid #e0e0e0;
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: center;
     background-color: #fff;
     flex-shrink: 0;
+    gap: 8px;
 }
 
 .note-count {
     font-size: var(--fs-caption);
     color: var(--text-muted);
+    flex-shrink: 0;
+}
+
+/* ===== BUSCA (rodapé) ===== */
+.search-wrap {
+    position: relative;
+    /* Não cresce (fica no tamanho ~30 caracteres do input, via size="30");
+       encolhe só se o rodapé ficar apertado. */
+    flex: 0 1 auto;
+    min-width: 0;
+}
+
+.search-input {
+    max-width: 100%;
+    padding: 5px 26px 5px 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-family: var(--font-ui);
+    font-size: var(--fs-caption);
+    color: var(--text-primary);
+    background-color: #f6f6f6;
+    outline: none;
+    transition: border-color 0.2s, background-color 0.2s;
+}
+
+.search-input::placeholder {
+    color: var(--text-muted);
+}
+
+.search-input:focus {
+    border-color: #ffd93d;
+    background-color: #fff;
+}
+
+.search-clear {
+    position: absolute;
+    right: 4px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border: none;
+    background: #e0e0e0;
+    color: #666;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 10px;
+    line-height: 1;
+    padding: 0;
+    transition: background-color 0.15s, color 0.15s;
+}
+
+.search-clear.visible {
+    display: flex;
+}
+
+.search-clear:hover {
+    background: #ccc;
+    color: #333;
+}
+
+/* Grifo do termo encontrado na busca */
+.search-hl {
+    background-color: #b2f2bb;
+    color: #12522a;
+    border-radius: 2px;
+    padding: 0 1px;
+}
+
+/* Surgimento suave da lista ao filtrar/limpar (não assusta o usuário) */
+@keyframes search-fade-in {
+    from { opacity: 0.35; }
+    to { opacity: 1; }
+}
+
+.notes-container.search-fade {
+    animation: search-fade-in 0.22s ease;
 }
 
 .clear-btn {
@@ -1297,6 +1378,11 @@ body {
     padding: 4px 8px;
     border-radius: 4px;
     transition: background-color 0.2s, transform 0.15s;
+    flex-shrink: 0;
+    white-space: nowrap;
+    /* Empurra o "Limpar tudo" para a extrema direita, deixando contador + busca
+       agrupados à esquerda. */
+    margin-left: auto;
 }
 
 .clear-btn:hover {
