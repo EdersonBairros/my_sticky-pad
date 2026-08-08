@@ -14,7 +14,10 @@ const RESIZE_LIMITS = Object.freeze({
     MIN_WIDTH: 250,
     MIN_HEIGHT: 200,
     MAX_WIDTH: 800,
-    MAX_HEIGHT: 800
+    // O popup do Chrome tem teto de ~600px de altura. Passar disso fazia o body
+    // ficar maior que a janela -> o popup inteiro ganhava scroll e o cabecalho/
+    // rodape rolavam junto (sumiam). Limitamos a 600 pra so a lista rolar.
+    MAX_HEIGHT: 600
 });
 
 const PRESET_COLORS = Object.freeze([
