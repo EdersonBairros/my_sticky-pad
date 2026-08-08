@@ -16,8 +16,9 @@
         <div class="resize-handle resize-handle-corner-ne" data-resize="ne"></div>
         <div class="resize-handle resize-handle-left" data-resize="left"></div>
         <div class="header">
-            <h1>📝 Sticky-Pad</h1>
-            <div class="header-actions">
+            <button id="backBtn" class="back-btn" title="Voltar para a tela principal" aria-label="Voltar"><span class="back-arrow" aria-hidden="true">←</span> Voltar</button>
+            <h1 id="headerTitle">📝 Sticky-Pad</h1>
+            <div id="headerActions" class="header-actions">
                 <button id="addNoteBtn" class="add-btn" title="Adicionar novo lembrete">+</button>
                 <div class="options-wrap">
                     <button id="optionsBtn" class="options-btn" title="Mais opções">⋮</button>
@@ -40,6 +41,7 @@
                 <input type="text" id="searchInput" class="search-input" placeholder="Buscar notas ou Categorias..." maxlength="30" size="30" autocomplete="off">
                 <button id="searchClearBtn" class="search-clear" title="Limpar busca" aria-label="Limpar busca">✕</button>
             </div>
+            <button id="archiveBoxBtn" class="archive-box-btn" title="Notas arquivadas" aria-label="Notas arquivadas">🗃️</button>
             <button id="clearAllBtn" class="clear-btn" title="Limpar todos os lembretes">🗑️ Limpar tudo</button>
         </div>
     </div>
@@ -61,6 +63,7 @@
     <script src="src/ui/category-picker.js"></script>
     <script src="src/ui/notes.renderer.js"></script>
     <script src="src/ui/search.js"></script>
+    <script src="src/ui/views.js"></script>
     <script src="src/ui/options-menu.js"></script>
     <script src="src/core/note.controller.js"></script>
     <script src="src/core/app.js"></script>

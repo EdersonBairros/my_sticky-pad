@@ -52,13 +52,22 @@ function initSearch(refs) {
     });
 }
 
-/** Limpa a busca em um clique e restaura a lista (com efeito sutil). */
-function _clearSearch() {
+/**
+ * Limpa o campo e o termo, SEM re-renderizar nem focar. Usado ao trocar de tela
+ * (principal ↔ arquivados), onde a própria troca já cuida do render.
+ */
+function clearSearch() {
     if (!_refs) return;
     clearTimeout(_debounceId);
     _refs.input.value = '';
     _searchTerm = '';
     _toggleClearButton();
+}
+
+/** Limpa a busca em um clique e restaura a lista (com efeito sutil). */
+function _clearSearch() {
+    if (!_refs) return;
+    clearSearch();
     _applySearch();
     _refs.input.focus();
 }

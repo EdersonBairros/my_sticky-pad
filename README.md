@@ -8,6 +8,7 @@ Uma extensão de navegador (Chrome/Firefox Manifest V3) que funciona como um blo
 - ✅ **Título por nota** (opcional, até 25 caracteres) — fixa no topo-esquerdo da nota na listagem, com hierarquia tipográfica (Segoe UI semibold)
 - ✅ **Fixar notas (pin)** — alfinete no topo-esquerdo (e ao lado do Salvar na edição); notas fixadas sobem para o topo (mais recente fixada primeiro), com sombra de destaque e efeito de "cravar"
 - ✅ **Filtro de busca** — campo no rodapé (live search com debounce de 300ms) que filtra por título, categoria e corpo; sem acento/maiúsculas ("café" = "cafe"), grifa o termo encontrado e respeita a ordem das notas fixadas
+- ✅ **Notas arquivadas** — caixa 📦 no rodapé abre uma tela separada só com as arquivadas (visual "guardado"); arquivar (📦) tira o pin e manda para a caixa, restaurar (↩️) traz de volta, e a lixeira exclui definitivamente. Busca e contador funcionam nas duas telas
 - ✅ Formatação de texto (negrito, itálico, sublinhado, listas)
 - ✅ Seletor de emojis com categorias e favoritos
 - ✅ Rolagem infinita entre categorias de emoji
@@ -114,6 +115,7 @@ Campos (ver `models/note.js`):
 - `createdAt` → data de **criação**, imutável (é a data exibida na nota).
 - `updatedAt` → data da **última edição**.
 - `pinned` / `pinnedAt` → fixação (pin). `pinnedAt` guarda quando foi fixada.
+- `archived` → se a nota está na "caixa" de arquivadas (tela separada). **Invariante**: nota arquivada nunca tem pin.
 
 **Ordenação da listagem**: (1) notas **fixadas** primeiro, da mais recente fixada (`pinnedAt`) para a mais antiga; (2) depois as **não fixadas**, da última edição (`updatedAt`) para a mais antiga.
 
@@ -205,3 +207,4 @@ Seguimos **SemVer** (`MAJOR.MINOR.PATCH`). A cada mudança, a versão em
 | **3.3.2** | 🟢 PATCH | Corrige regressão da 3.3.1: o botão ✓ de criar categoria transbordava para fora da modal (o input, com fonte 13px, não encolhia no flex). Adicionado `min-width: 0` no `.category-input` |
 | **3.4.0** | 🟡 MINOR | Fixar notas (pin): campos `pinned`/`pinnedAt`, ordenação com fixadas no topo (mais recente fixada primeiro), botão de alfinete na listagem (topo-esquerdo do título) e na edição (ao lado do Salvar), sombra de destaque na nota fixada e animação de "cravar". Export → v4 (import tolerante a v1–v3). Retrocompatível com notas sem `pinned` |
 | **3.5.0** | 🟡 MINOR | Filtro de busca no rodapé: live search com debounce de 300ms sobre título/categoria/corpo, case- e acento-insensível, grifo do termo (verde), botão "X" para limpar, estado vazio "Nenhuma nota encontrada", respeitando a ordem das fixadas e com surgimento suave. Limite do título 20 → 25 caracteres |
+| **3.6.0** | 🟡 MINOR | Notas arquivadas: campo `archived`, tela separada (caixa 📦 no rodapé) com cabeçalho "Notas Arquivadas" + botão ⬅️ Voltar, cards read-only "guardados" (opacidade + borda cinza) com Restaurar (↩️) e Excluir definitivo, botão de arquivar 📦 nos cards da principal (remove o pin). Contador e busca globais nas duas telas; transição suave; caixa treme + micro-texto quando vazia; estado reseta ao reabrir o popup. Export → v5 (inclui arquivadas; import tolerante a v1–v4, importadas sempre abaixo) |

@@ -19,11 +19,15 @@
  * @param {string|null} [data.category=null] - Categoria da nota
  * @param {boolean} [data.pinned=false] - Se a nota está fixada (pin)
  * @param {string|null} [data.pinnedAt=null] - Momento em que foi fixada (ISO); ordena as fixadas
+ * @param {boolean} [data.archived=false] - Se a nota está arquivada (na "caixa")
  * @returns {Note} Nova nota
  */
 function createNote(data = {}) {
     const now = new Date().toISOString();
     const createdAt = data.createdAt || now;
+    // Invariante: nota arquivada NUNCA tem pin (pin é prioridade na tela principal).
+    const archived = data.archived === true;
+    const pinned = !archived && data.pinned === true;
     return {
         id: Date.now().toString() + Math.random().toString(36).slice(2, 6),
         // Título é texto puro e opcional; aparado ao limite (defensivo p/ import).
@@ -35,8 +39,10 @@ function createNote(data = {}) {
         color: data.color || null,
         category: data.category || null,
         // Fixação (pin): `pinnedAt` guarda quando foi fixada, para ordenar as fixadas.
-        pinned: data.pinned === true,
-        pinnedAt: data.pinned === true ? (data.pinnedAt || now) : null
+        pinned: pinned,
+        pinnedAt: pinned ? (data.pinnedAt || now) : null,
+        // Arquivamento: notas arquivadas vivem na "caixa" (tela separada).
+        archived: archived
     };
 }
 

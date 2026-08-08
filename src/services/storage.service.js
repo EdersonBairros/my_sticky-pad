@@ -103,7 +103,14 @@ function storagePersistSilent() {
     );
 }
 
-function storageClearAll() { _notes = []; _persist(); }
+/**
+ * Remove apenas as notas NÃO-arquivadas (as da tela principal). As arquivadas
+ * são mantidas — arquivar guarda a nota "em segurança".
+ */
+function storageClearNonArchived() {
+    _notes = _notes.filter(n => n.archived === true);
+    _persist();
+}
 
 /**
  * Carrega e aplica o tamanho salvo do popup.

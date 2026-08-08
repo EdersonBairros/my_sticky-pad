@@ -12,10 +12,11 @@
  */
 function buildExportData(notes) {
     return {
-        // v4: notas passaram a ter `pinned`/`pinnedAt`, além de `title` (v3) e
-        // `updatedAt` (v2). O import é tolerante a arquivos v1/v2/v3 (campos
-        // ausentes viram padrões seguros: sem título, não fixada, etc.).
-        version: 4,
+        // v5: notas passaram a ter `archived`, além de `pinned`/`pinnedAt` (v4),
+        // `title` (v3) e `updatedAt` (v2). Backup completo (inclui arquivadas).
+        // O import é tolerante a arquivos v1–v4 (campos ausentes viram padrões
+        // seguros: sem título, não fixada, não arquivada, etc.).
+        version: 5,
         exportedAt: new Date().toISOString(),
         notes: notes
     };

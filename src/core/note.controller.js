@@ -56,6 +56,55 @@ function handleDeleteNote(id) {
 }
 
 /**
+ * Arquiva uma nota (move para a "caixa"). Remove o pin — nota arquivada não
+ * tem prioridade (req).
+ * @param {string} id
+ */
+function handleArchiveNote(id) {
+    const note = getNoteById(id);
+    if (!note) return;
+
+    const finish = () => {
+        if (_editingId === id) _editingId = null;
+        note.archived = true;
+        note.pinned = false;
+        note.pinnedAt = null;
+        storagePersist();
+        renderNotes(_notesContainer, _editingId);
+        updateNoteCount(_noteCountElement);
+    };
+
+    showToast('Nota arquivada', 'success');
+
+    // Anima a saída do card (fade + leve slide para a direita) e só então
+    // remove da lista. Se o card não estiver no DOM, aplica direto.
+    const item = document.querySelector(`.note-item[data-id="${id}"]`);
+    if (item) {
+        item.classList.add('archiving-out');
+        setTimeout(finish, 260);
+    } else {
+        finish();
+    }
+}
+
+/**
+ * Restaura uma nota arquivada para a tela principal. O pin permanece removido
+ * (arquivada perdeu a prioridade).
+ * @param {string} id
+ */
+function handleRestoreNote(id) {
+    const note = getNoteById(id);
+    if (!note) return;
+    note.archived = false;
+    note.pinned = false;
+    note.pinnedAt = null;
+    storagePersist();
+    renderNotes(_notesContainer, _editingId);
+    updateNoteCount(_noteCountElement);
+    showToast('Nota restaurada', 'success');
+}
+
+/**
  * Inicia o modo de edição para uma nota existente.
  * @param {string} id
  */
@@ -146,14 +195,17 @@ function handleCancelEditing() {
  * @returns {Promise<void>}
  */
 async function handleClearAllNotes() {
-    if (getNotes().length === 0) return;
-    const confirmed = await showConfirm('Limpar todos os lembretes?');
+    // Limpa apenas as notas da tela principal (não-arquivadas). As arquivadas
+    // ficam guardadas em segurança.
+    const hasMainNotes = getNotes().some(n => !n.archived);
+    if (!hasMainNotes) return;
+    const confirmed = await showConfirm('Limpar todos os lembretes? (As notas arquivadas serão mantidas.)');
     if (!confirmed) return;
-    storageClearAll();
+    storageClearNonArchived();
     _editingId = null;
     renderNotes(_notesContainer, _editingId);
     updateNoteCount(_noteCountElement);
-    showToast('Todas as notas foram removidas.', 'warning');
+    showToast('Lembretes removidos (arquivadas mantidas).', 'warning');
 }
 
 /**

@@ -86,18 +86,27 @@ function handleImport(file, notesContainer) {
     reader.onload = function (ev) {
         try {
             const imported = parseImportData(ev.target.result);
-            const existingIds = new Set(getNotes().map(n => n.id));
-            let added = 0;
+            const existing = getNotes();
 
+            // "Sempre abaixo": encontramos o menor timestamp entre as notas
+            // existentes para rebaixar a ordenação das importadas (sem alterar a
+            // data exibida `createdAt`), garantindo que nunca subam acima do
+            // trabalho atual — respeitando pin/arquivado dentro da mescla.
+            let floor = Date.now();
+            existing.forEach(n => {
+                [n.updatedAt, n.createdAt, n.pinnedAt].forEach(t => {
+                    if (!t) return;
+                    const ms = new Date(t).getTime();
+                    if (!isNaN(ms) && ms < floor) floor = ms;
+                });
+            });
+
+            let added = 0;
             imported.forEach(n => {
                 if (!n || typeof n !== 'object') return;
-                const id = (n.id && !existingIds.has(n.id))
-                    ? n.id
-                    : Date.now().toString() + Math.random().toString(36).slice(2);
-                existingIds.add(id);
-                // Sanitiza o HTML importado (vetor de XSS) e preserva as datas.
-                // O título é texto puro (createNote apara ao limite).
-                storageAddNote(createNote({
+                // Sanitiza o HTML importado (vetor de XSS), preserva estado
+                // (arquivada/pin/cor/categoria) e a data exibida (createdAt).
+                const note = createNote({
                     title: n.title,
                     text: sanitizeHtml(typeof n.text === 'string' ? n.text : ''),
                     createdAt: n.createdAt,
@@ -105,9 +114,14 @@ function handleImport(file, notesContainer) {
                     color: n.color,
                     category: n.category || null,
                     pinned: n.pinned === true,
-                    pinnedAt: n.pinnedAt
-                }));
-                added++;
+                    pinnedAt: n.pinnedAt,
+                    archived: n.archived === true
+                });
+                // Chave de ordenação abaixo de todas as existentes.
+                const low = new Date(floor - (++added) * 60000).toISOString();
+                note.updatedAt = low;
+                if (note.pinned) note.pinnedAt = low;
+                storageAddNote(note);
             });
 
             renderNotes(notesContainer, null);
