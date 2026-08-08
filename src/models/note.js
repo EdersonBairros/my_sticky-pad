@@ -17,6 +17,8 @@
  * @param {string} [data.updatedAt] - Data da última edição (ISO)
  * @param {string|null} [data.color=null] - Cor de fundo em hex
  * @param {string|null} [data.category=null] - Categoria da nota
+ * @param {boolean} [data.pinned=false] - Se a nota está fixada (pin)
+ * @param {string|null} [data.pinnedAt=null] - Momento em que foi fixada (ISO); ordena as fixadas
  * @returns {Note} Nova nota
  */
 function createNote(data = {}) {
@@ -31,7 +33,10 @@ function createNote(data = {}) {
         // Notas antigas/importadas sem `updatedAt` herdam o `createdAt` (backfill).
         updatedAt: data.updatedAt || createdAt,
         color: data.color || null,
-        category: data.category || null
+        category: data.category || null,
+        // Fixação (pin): `pinnedAt` guarda quando foi fixada, para ordenar as fixadas.
+        pinned: data.pinned === true,
+        pinnedAt: data.pinned === true ? (data.pinnedAt || now) : null
     };
 }
 

@@ -91,6 +91,18 @@ function storageRemoveNote(id) { _notes = _notes.filter(n => n.id !== id); _pers
 
 function storagePersist() { _persist(); }
 
+/**
+ * Persiste o cache SEM disparar o callback de mudança (re-render).
+ * Use quando o chamador já atualiza a UI por conta própria (ex.: pin), para
+ * evitar uma re-renderização que reconstruiria o editor (piscada do placeholder)
+ * ou reordenaria a lista sem animação.
+ */
+function storagePersistSilent() {
+    storageSet(STORAGE_KEYS.NOTES, _notes).catch(e =>
+        console.warn('Erro ao salvar notas:', e)
+    );
+}
+
 function storageClearAll() { _notes = []; _persist(); }
 
 /**

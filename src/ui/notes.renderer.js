@@ -11,7 +11,9 @@
  */
 function createNoteElement(note, editingId) {
     const div = document.createElement('div');
-    div.className = 'note-item' + (editingId === note.id ? ' editing' : '');
+    div.className = 'note-item'
+        + (editingId === note.id ? ' editing' : '')
+        + (note.pinned ? ' pinned' : '');
     div.dataset.id = note.id;
 
     if (note.color && editingId !== note.id) {
@@ -61,6 +63,7 @@ function _buildEditingNote(div, note) {
         <div class="edit-actions">
             <button class="category-btn" data-action="category-toggle" title="Categorias">⚙️</button>
             <div class="edit-actions-right">
+                <button class="pin-btn edit-pin ${note.pinned ? 'active' : ''}" data-action="pin-toggle" title="${note.pinned ? 'Desafixar nota' : 'Fixar nota'}" aria-label="${note.pinned ? 'Desafixar nota' : 'Fixar nota'}">📌</button>
                 <button class="save-btn" data-action="save">💾 Salvar</button>
                 <button class="cancel-btn" data-action="cancel">❌ Cancelar</button>
             </div>
@@ -105,10 +108,14 @@ function _buildViewNote(div, note) {
     // `note.text` é HTML rico da nota. Passa por sanitizeHtml (whitelist) como
     // choke point final de XSS — protege inclusive dados persistidos antes da
     // correção. A data exibida é `createdAt` (data real de criação, imutável).
+    const pinLabel = note.pinned ? 'Desafixar nota' : 'Fixar nota';
     div.innerHTML = `
         <button class="color-btn" data-action="color-toggle" title="Alterar cor da nota">🎨</button>
         ${note.category ? `<span class="note-category-badge">${escapeHtml(note.category)}</span>` : ''}
-        ${note.title ? `<div class="note-title">${escapeHtml(note.title)}</div>` : ''}
+        <div class="note-head">
+            <button class="pin-btn ${note.pinned ? 'active' : ''}" data-action="pin-toggle" title="${pinLabel}" aria-label="${pinLabel}">📌</button>
+            ${note.title ? `<span class="note-title">${escapeHtml(note.title)}</span>` : ''}
+        </div>
         <div class="note-text">${sanitizeHtml(note.text || '')}</div>
         <div class="note-footer">
             <span class="note-date">${formatDate(note.createdAt)}</span>
@@ -142,11 +149,15 @@ function renderNotes(notesContainer, editingId) {
         return;
     }
 
-    // Ordena pela última edição (mais recente no topo). Notas antigas sem
-    // `updatedAt` caem no `createdAt` (backfill).
-    const sorted = [...notes].sort((a, b) =>
-        new Date(b.updatedAt || b.createdAt) - new Date(a.updatedAt || a.createdAt)
-    );
+    // Ordenação: notas FIXADAS primeiro (mais recente fixada no topo, via
+    // `pinnedAt`); depois as demais pela última edição (mais recente no topo).
+    // Notas antigas sem `updatedAt`/`pinned` caem nos fallbacks (retrocompatível).
+    const sorted = [...notes].sort((a, b) => {
+        const ap = a.pinned === true, bp = b.pinned === true;
+        if (ap !== bp) return ap ? -1 : 1;
+        if (ap && bp) return new Date(b.pinnedAt || 0) - new Date(a.pinnedAt || 0);
+        return new Date(b.updatedAt || b.createdAt) - new Date(a.updatedAt || a.createdAt);
+    });
 
     if (editingId) {
         const idx = sorted.findIndex(n => n.id === editingId);

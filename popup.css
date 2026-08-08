@@ -262,6 +262,11 @@ body {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
+/* Nota fixada (pin): sombra um pouco mais forte para destacar na listagem. */
+.note-item.pinned {
+    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.18);
+}
+
 /* ===== COLOR PICKER BUTTON ===== */
 .color-btn {
     position: absolute;
@@ -459,12 +464,21 @@ body {
     opacity: 0.85;
 }
 
-/* ===== TÍTULO DA NOTA (Visualização) ===== */
+/* ===== CABEÇALHO DA NOTA: PIN + TÍTULO (Visualização) ===== */
 /*
- * Fixa no topo-esquerdo da nota. Fonte Trebuchet MS (destoa do corpo em
- * Segoe UI) em negrito. `padding-right` reserva espaço para o botão de cor /
- * badge de categoria no canto superior direito, evitando sobreposição.
+ * O alfinete (pin) fica no topo-esquerdo, à esquerda da região do título
+ * (que é opcional). Ocupa lugar fixo para não deslocar o título. O título usa
+ * a família Segoe UI (sistema tipográfico) em semibold. `padding-right` reserva
+ * o canto superior-direito (🎨 e badge de categoria), evitando sobreposição.
  */
+.note-head {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 4px;
+    padding-right: 36px;
+}
+
 .note-title {
     font-family: var(--font-ui);
     font-weight: var(--fw-semibold);
@@ -472,10 +486,65 @@ body {
     letter-spacing: var(--ls-tight);
     color: var(--text-primary);
     line-height: 1.3;
-    margin-bottom: 4px;
-    padding-left: 4px;
-    padding-right: 44px;
-    word-break: break-word;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* ===== BOTÃO DE PIN (alfinete) ===== */
+.pin-btn {
+    border: none;
+    background: none;
+    cursor: pointer;
+    line-height: 1;
+    padding: 2px;
+    flex-shrink: 0;
+    transition: opacity 0.15s, transform 0.15s, filter 0.15s;
+}
+
+/* Alfinete "fincado" quando ativo */
+.pin-btn.active {
+    transform: rotate(-8deg);
+}
+
+/* Discreto na listagem: esmaecido quando não fixada (sem sumir no hover,
+   para a lista não "pular"); realça no hover e fica cheio quando fixada. */
+.note-head .pin-btn {
+    font-size: 13px;
+    opacity: 0.3;
+    filter: grayscale(1);
+}
+
+.note-item:hover .note-head .pin-btn {
+    opacity: 0.7;
+}
+
+.note-head .pin-btn.active {
+    opacity: 1;
+    filter: none;
+}
+
+/* Botão de pin no modo de edição (ao lado esquerdo do Salvar) */
+.edit-pin {
+    font-size: 15px;
+    opacity: 0.55;
+}
+
+.edit-pin.active {
+    opacity: 1;
+}
+
+/* Efeito "cravar" ao ativar/desativar o alfinete */
+@keyframes pin-tack {
+    0% { transform: scale(1) translateY(-4px) rotate(0deg); }
+    40% { transform: scale(0.7) translateY(3px) rotate(-6deg); }
+    70% { transform: scale(1.12) translateY(-1px) rotate(2deg); }
+    100% { transform: scale(1) translateY(0) rotate(0deg); }
+}
+
+.pin-btn.tacking {
+    animation: pin-tack 0.4s ease;
 }
 
 /* ===== CAMPO DE TÍTULO (Edição) ===== */
