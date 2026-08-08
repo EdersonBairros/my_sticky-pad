@@ -6,6 +6,7 @@ Uma extensão de navegador (Chrome/Firefox Manifest V3) que funciona como um blo
 
 - ✅ Criar, editar e excluir lembretes
 - ✅ **Título por nota** (opcional, até 20 caracteres) — fixa no topo-esquerdo da nota na listagem, com hierarquia tipográfica (Segoe UI semibold)
+- ✅ **Fixar notas (pin)** — alfinete no topo-esquerdo (e ao lado do Salvar na edição); notas fixadas sobem para o topo (mais recente fixada primeiro), com sombra de destaque e efeito de "cravar"
 - ✅ Formatação de texto (negrito, itálico, sublinhado, listas)
 - ✅ Seletor de emojis com categorias e favoritos
 - ✅ Rolagem infinita entre categorias de emoji
@@ -110,11 +111,14 @@ Campos (ver `models/note.js`):
 - `title` → **título** curto e opcional (texto puro, máx. `MAX_TITLE_LENGTH` = 20 chars). Exibido no topo-esquerdo da nota na listagem (Segoe UI semibold, 16px — ver Sistema tipográfico).
 - `text` → corpo em HTML rico (sanitizado).
 - `createdAt` → data de **criação**, imutável (é a data exibida na nota).
-- `updatedAt` → data da **última edição**, usada para **ordenar** (mais recente no topo).
+- `updatedAt` → data da **última edição**.
+- `pinned` / `pinnedAt` → fixação (pin). `pinnedAt` guarda quando foi fixada.
+
+**Ordenação da listagem**: (1) notas **fixadas** primeiro, da mais recente fixada (`pinnedAt`) para a mais antiga; (2) depois as **não fixadas**, da última edição (`updatedAt`) para a mais antiga.
 
 **Regra de "nota em branco"**: uma nota só é descartada se estiver sem corpo **E** sem título — portanto uma nota só com título é válida e é salva normalmente.
 
-Notas antigas/importadas sem `updatedAt` fazem *backfill* a partir do `createdAt`; sem `title`, tratam o título como vazio (não quebram nada).
+Notas antigas/importadas sem `updatedAt` fazem *backfill* a partir do `createdAt`; sem `title`, tratam o título como vazio; sem `pinned`, são consideradas não fixadas (não quebram nada).
 
 ## 🔡 Sistema tipográfico
 
@@ -198,3 +202,4 @@ Seguimos **SemVer** (`MAJOR.MINOR.PATCH`). A cada mudança, a versão em
 | **3.3.0** | 🟡 MINOR | Título opcional por nota (máx. 20 chars, Trebuchet MS negrito no topo-esquerdo da listagem). Nota é válida com título OU corpo. Retrocompatível: notas antigas sem `title` funcionam normalmente. Export passa a v3 (import tolerante a v1/v2) |
 | **3.3.1** | 🟢 PATCH | Sistema tipográfico unificado: família única (Segoe UI) com hierarquia por tamanho/peso/cor/espaçamento, aplicado a todas as superfícies (cabeçalho, notas, inputs, botões, menus, alertas, radios). Título da nota migra de Trebuchet MS para Segoe UI semibold. Ajustes de UX: negrito em Exportar/Importar e "Limpar tudo", mensagem de limpar encurtada ("Limpar todos os lembretes?"), e data reposicionada no rodapé da nota (borda inferior-esquerda). Sem mudança de comportamento |
 | **3.3.2** | 🟢 PATCH | Corrige regressão da 3.3.1: o botão ✓ de criar categoria transbordava para fora da modal (o input, com fonte 13px, não encolhia no flex). Adicionado `min-width: 0` no `.category-input` |
+| **3.4.0** | 🟡 MINOR | Fixar notas (pin): campos `pinned`/`pinnedAt`, ordenação com fixadas no topo (mais recente fixada primeiro), botão de alfinete na listagem (topo-esquerdo do título) e na edição (ao lado do Salvar), sombra de destaque na nota fixada e animação de "cravar". Export → v4 (import tolerante a v1–v3). Retrocompatível com notas sem `pinned` |

@@ -103,7 +103,9 @@ function handleImport(file, notesContainer) {
                     createdAt: n.createdAt,
                     updatedAt: n.updatedAt,
                     color: n.color,
-                    category: n.category || null
+                    category: n.category || null,
+                    pinned: n.pinned === true,
+                    pinnedAt: n.pinnedAt
                 }));
                 added++;
             });

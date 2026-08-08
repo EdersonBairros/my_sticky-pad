@@ -70,6 +70,7 @@ function _initActionDispatcher(container) {
         switch (target.dataset.action) {
             case 'edit': startEditing(id); break;
             case 'delete': handleDeleteNote(id); break;
+            case 'pin-toggle': togglePin(id); break;
             case 'save': saveEditing(id); break;
             case 'cancel': handleCancelEditing(); break;
             case 'emoji-toggle': _toggleEmojiPicker(item, target); break;
