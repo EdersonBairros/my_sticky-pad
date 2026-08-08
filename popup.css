@@ -1003,6 +1003,9 @@ body {
 
 .category-input {
     flex: 1;
+    /* min-width:0 permite o input encolher no flex (senão ele mantém a largura
+       "natural" de ~20 chars e empurra o botão ✓ para fora da modal). */
+    min-width: 0;
     padding: 6px 8px;
     border: 1px solid #ddd;
     border-radius: 4px;
