@@ -5,10 +5,11 @@ Uma extensão de navegador (Chrome/Firefox Manifest V3) que funciona como um blo
 ## ✨ Funcionalidades
 
 - ✅ Criar, editar e excluir lembretes
-- ✅ **Título por nota** (opcional, até 25 caracteres) — fixa no topo-esquerdo da nota na listagem, com hierarquia tipográfica (Segoe UI semibold)
+- ✅ **Título por nota** (opcional, até 25 caracteres) — fixa no topo-esquerdo da nota na listagem, com hierarquia tipográfica (semibold)
 - ✅ **Fixar notas (pin)** — alfinete no topo-esquerdo (e ao lado do Salvar na edição); notas fixadas sobem para o topo (mais recente fixada primeiro), com sombra de destaque e efeito de "cravar"
 - ✅ **Filtro de busca** — campo no rodapé (live search com debounce de 300ms) que filtra por título, categoria e corpo; sem acento/maiúsculas ("café" = "cafe"), grifa o termo encontrado e respeita a ordem das notas fixadas
-- ✅ **Notas arquivadas** — caixa 📦 no rodapé abre uma tela separada só com as arquivadas (visual "guardado"); arquivar (📦) tira o pin e manda para a caixa, restaurar (↩️) traz de volta, e a lixeira exclui definitivamente. Busca e contador funcionam nas duas telas
+- ✅ **Notas arquivadas** — caixa 🗃️ no rodapé abre uma tela separada só com as arquivadas (visual "guardado"); arquivar (🗂️) tira o pin e manda para a caixa, restaurar (↩️) traz de volta, e a lixeira exclui definitivamente. Busca e contador funcionam nas duas telas
+- ✅ **Tema claro/escuro** — botão animado (sol ☀️ ↔ lua 🌙) ao lado do `+`; segue o tema do sistema por padrão e lembra a escolha manual. Cores centralizadas em `theme.css` (design tokens)
 - ✅ Formatação de texto (negrito, itálico, sublinhado, listas)
 - ✅ Seletor de emojis com categorias e favoritos
 - ✅ Rolagem infinita entre categorias de emoji
@@ -50,9 +51,13 @@ src/
 │   ├── color-picker.js        → Seletor de cores com gradiente canvas
 │   ├── emoji-picker.js        → Seletor de emojis com categorias, scroll infinito e favoritos
 │   ├── category-picker.js     → Modal de categorias da nota (radio, criar/excluir, desfazer)
+│   ├── search.js              → Filtro de busca do rodapé (live search com grifo)
+│   ├── views.js               → Navegação entre telas Principal e Arquivadas
 │   ├── resize.js              → Handles de redimensionamento do popup
 │   ├── options-menu.js        → Menu de opções (⋮) com exportar/importar
-│   └── notifications.js       → Sistema de notificações toast
+│   ├── notifications.js       → Sistema de notificações toast
+│   ├── theme-init.js          → Aplica o tema antes do paint (sem flash), no <head>
+│   └── theme.js               → Toggle de tema (sol/lua), persistência e animação
 ├── utils/
 │   ├── date.js                → Formatação relativa de datas
 │   ├── color.js               → Utilitários de cor (escurecer, validar hex)
@@ -60,6 +65,11 @@ src/
 │   └── dom.js                 → escapeHtml + sanitizeHtml (proteção XSS)
 ├── index.js                   → Entry point (DOMContentLoaded → bootstrap)
 ```
+
+Na **raiz** ficam `popup.html` (marcação), `popup.css` (estilos) e `theme.css`
+(design tokens dos temas + `@font-face` da Inter). Assets: `fonts/` (fonte Inter
+`.woff2` empacotada) e `icons/` (ícones da extensão + `sticky_pad_icon.svg`, logo
+do cabeçalho).
 
 ### Princípios
 
@@ -110,7 +120,7 @@ modo que usuários **não perdem notas** ao atualizar.
 
 Campos (ver `models/note.js`):
 
-- `title` → **título** curto e opcional (texto puro, máx. `MAX_TITLE_LENGTH` = 25 chars). Exibido no topo-esquerdo da nota na listagem (Segoe UI semibold, 16px — ver Sistema tipográfico).
+- `title` → **título** curto e opcional (texto puro, máx. `MAX_TITLE_LENGTH` = 25 chars). Exibido no topo-esquerdo da nota na listagem (Inter semibold, 17px — ver Sistema tipográfico).
 - `text` → corpo em HTML rico (sanitizado).
 - `createdAt` → data de **criação**, imutável (é a data exibida na nota).
 - `updatedAt` → data da **última edição**.
@@ -125,23 +135,52 @@ Notas antigas/importadas sem `updatedAt` fazem *backfill* a partir do `createdAt
 
 ## 🔡 Sistema tipográfico
 
-Uma **família única** — `Segoe UI` (fonte nativa do Windows) — com hierarquia
-criada por **tamanho, peso, cor e espaçamento** (nunca se misturam fontes).
-Definido em variáveis CSS no topo de `popup.css` (`:root`), que é o **ponto
-único** para reajustar o "tom" da extensão inteira.
+A extensão usa a fonte **Inter** — **empacotada/self-hosted** em `fonts/` (subset
+*latin*, que cobre os acentos do PT-BR; pesos 400/500/600/700; licença SIL OFL).
+É carregada via `@font-face` no `theme.css` e vem **primeiro** em `--font-ui`, com
+o *system stack* (`-apple-system`, `Segoe UI`, …) apenas como fallback.
 
-| Papel | Tamanho | Peso | Cor |
-|-------|---------|------|-----|
-| Título da extensão | 17px | 600 | primário |
-| Título da nota | 16px | 600 | primário |
-| Corpo / editor | 14px | 400 | primário |
-| Botões, menus, inputs, radios | 13px | 500/400 | primário |
-| Contador, textos auxiliares | 12px | 400 | muted |
-| Data e rótulos (ex.: CORES) | 11px | 600 | muted/secundário |
+> **Por que empacotar?** O stack de sistema caía para a **Segoe UI** no Windows
+> (as fontes `-apple-system`/`SF Pro` só existem no Mac), e o espaçamento fino
+> pensado para a SF Pro deixava os textos "espremidos". Com a Inter local, o
+> visual fica moderno e **consistente em qualquer SO**.
 
-Cores de texto em 3 tons: `--text-primary` (#2b2b2b), `--text-secondary`
-(#6b6b6b), `--text-muted` (#9a9a9a). A fonte monoespaçada fica restrita ao campo
-de código hexadecimal de cor (`--font-mono`).
+Hierarquia por **tamanho, peso, cor e espaçamento** (nunca se misturam fontes),
+toda em variáveis CSS no `theme.css` (`:root`) — ponto único para reajustar o
+"tom" da extensão inteira.
+
+| Papel | Token | Tamanho | Peso |
+|-------|-------|---------|------|
+| Título da extensão | `--fs-app-title` | 18px | 700 |
+| Título da nota | `--fs-note-title` | 16px | 600 |
+| Corpo / editor | `--fs-body` | 13px | 400 |
+| Botões, menus, inputs, radios | `--fs-ui` | 12px | 500/400 |
+| Contador, textos auxiliares | `--fs-caption` | 11px | 400 |
+| Data e rótulos (ex.: CORES) | `--fs-micro` | 10px | 600 |
+
+Espaçamento (letter-spacing): títulos `--ls-tight` (-0.6px), corpo `--ls-body`
+(-0.4px), rótulos em caixa-alta `--ls-label` (0.4px). Entrelinha do corpo
+`--lh-body` 1.25. Valores definidos no afinador de tipografia (preview com a
+Inter real). Cores de texto via `--text-primary` / `--text-secondary` / `--text-muted`.
+A monoespaçada (`--font-mono`) fica restrita ao campo de hex de cor.
+
+## 🎨 Temas (claro/escuro)
+
+Todas as cores vivem como **design tokens** (variáveis CSS) em **`theme.css`** —
+um bloco para o tema claro (`:root`) e um para o escuro (`:root[data-theme="dark"]`).
+O `popup.css` nunca usa cor fixa; sempre `var(--token)`. Para reajustar cores ou
+os temas, mexa só no `theme.css`.
+
+**Como o tema é resolvido:**
+1. `theme-init.js` roda no `<head>` (antes do primeiro paint) e define
+   `data-theme="light|dark"` no `<html>` — evita o "flash" de tema errado.
+2. A preferência vem do `localStorage` (`stickypad-theme`); se não houver, segue
+   o tema do sistema (`prefers-color-scheme`).
+3. O botão de tema (`ui/theme.js`) alterna claro↔escuro, salva a escolha (que
+   passa a ter prioridade sobre o SO) e anima a troca.
+
+> A preferência de tema fica em `localStorage` (e não em `chrome.storage`) porque
+> precisa ser lida de forma **síncrona** para aplicar antes do paint.
 
 ## ⚠️ Limitações conhecidas / Débito técnico
 
@@ -207,4 +246,5 @@ Seguimos **SemVer** (`MAJOR.MINOR.PATCH`). A cada mudança, a versão em
 | **3.3.2** | 🟢 PATCH | Corrige regressão da 3.3.1: o botão ✓ de criar categoria transbordava para fora da modal (o input, com fonte 13px, não encolhia no flex). Adicionado `min-width: 0` no `.category-input` |
 | **3.4.0** | 🟡 MINOR | Fixar notas (pin): campos `pinned`/`pinnedAt`, ordenação com fixadas no topo (mais recente fixada primeiro), botão de alfinete na listagem (topo-esquerdo do título) e na edição (ao lado do Salvar), sombra de destaque na nota fixada e animação de "cravar". Export → v4 (import tolerante a v1–v3). Retrocompatível com notas sem `pinned` |
 | **3.5.0** | 🟡 MINOR | Filtro de busca no rodapé: live search com debounce de 300ms sobre título/categoria/corpo, case- e acento-insensível, grifo do termo (verde), botão "X" para limpar, estado vazio "Nenhuma nota encontrada", respeitando a ordem das fixadas e com surgimento suave. Limite do título 20 → 25 caracteres |
-| **3.6.0** | 🟡 MINOR | Notas arquivadas: campo `archived`, tela separada (caixa 📦 no rodapé) com cabeçalho "Notas Arquivadas" + botão ⬅️ Voltar, cards read-only "guardados" (opacidade + borda cinza) com Restaurar (↩️) e Excluir definitivo, botão de arquivar 📦 nos cards da principal (remove o pin). Contador e busca globais nas duas telas; transição suave; caixa treme + micro-texto quando vazia; estado reseta ao reabrir o popup. Export → v5 (inclui arquivadas; import tolerante a v1–v4, importadas sempre abaixo) |
+| **3.6.0** | 🟡 MINOR | Notas arquivadas: campo `archived`, tela separada (caixa 🗃️ no rodapé) com cabeçalho "Notas Arquivadas" + botão "← Voltar", cards read-only "guardados" (fundo cinza + sombra) com Restaurar (↩️) e Excluir definitivo, botão de arquivar 🗂️ nos cards da principal (remove o pin). Contador e busca globais nas duas telas; transição suave; caixa treme + micro-texto quando vazia; estado reseta ao reabrir o popup. Export → v5 (inclui arquivadas; import tolerante a v1–v4, importadas sempre abaixo) |
+| **3.7.0** | 🟡 MINOR | Redesign visual + tema claro/escuro. **Tema:** todas as cores viraram design tokens em `theme.css` (claro + escuro); botão animado (sol ↔ lua) com "rolagem" ao lado do `+`; segue o SO por padrão (`prefers-color-scheme`), lembra a escolha manual (localStorage) e aplica antes do paint (`theme-init.js`, sem flash); transição suave ao alternar. **Redesign (inspiração iOS):** paleta iOS no claro (acento azul `#007aff` / índigo `#5856d6`) e azul-acinzentado no escuro; fonte **Inter** empacotada (self-hosted em `fonts/`, subset latin, OFL) com escala tipográfica — antes o stack `-apple-system` caía pra Segoe UI no Windows; degradê vertical sutil no fundo (claro e escuro); logo SVG no cabeçalho; gradiente nos botões `+` / emoji; cabeçalho, rodapé e tela de arquivados **sem separadores e transparentes** (fundo contínuo); modal de confirmação menor; bordas de edição em azul. **Limpeza:** removidas as "orelhinhas" (gradiente) das alças de canto, mantendo o resize funcional; tokens órfãos eliminados |

@@ -5,7 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>sticky-pad Lembretes</title>
+    <link rel="stylesheet" href="theme.css">
     <link rel="stylesheet" href="popup.css">
+    <!-- Aplica o tema antes do primeiro paint (evita flash). -->
+    <script src="src/ui/theme-init.js"></script>
 </head>
 
 <body>
@@ -17,8 +20,12 @@
         <div class="resize-handle resize-handle-left" data-resize="left"></div>
         <div class="header">
             <button id="backBtn" class="back-btn" title="Voltar para a tela principal" aria-label="Voltar"><span class="back-arrow" aria-hidden="true">←</span> Voltar</button>
-            <h1 id="headerTitle">📝 Sticky-Pad</h1>
+            <img id="headerLogo" class="header-logo" src="icons/sticky_pad_icon.svg" alt="" aria-hidden="true">
+            <h1 id="headerTitle">Sticky-Pad</h1>
             <div id="headerActions" class="header-actions">
+                <button id="themeToggle" class="theme-toggle" type="button" aria-label="Alternar tema claro/escuro">
+                    <span class="tt-knob"><span class="tt-sun">☀️</span><span class="tt-moon">🌙</span></span>
+                </button>
                 <button id="addNoteBtn" class="add-btn" title="Adicionar novo lembrete">+</button>
                 <div class="options-wrap">
                     <button id="optionsBtn" class="options-btn" title="Mais opções">⋮</button>
@@ -64,6 +71,7 @@
     <script src="src/ui/notes.renderer.js"></script>
     <script src="src/ui/search.js"></script>
     <script src="src/ui/views.js"></script>
+    <script src="src/ui/theme.js"></script>
     <script src="src/ui/options-menu.js"></script>
     <script src="src/core/note.controller.js"></script>
     <script src="src/core/app.js"></script>

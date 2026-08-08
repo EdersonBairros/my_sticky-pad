@@ -1,0 +1,214 @@
+/*
+ * ============================================================================
+ * DESIGN TOKENS — tema claro e escuro (arquivo único de cores)
+ * ============================================================================
+ * Todas as cores/tipografia da extensão vivem aqui como variáveis CSS. O
+ * `popup.css` referencia tudo com `var(...)` e nunca usa cor fixa. Para ajustar
+ * o visual ou os temas, mexa SÓ neste arquivo.
+ *
+ * Tema: `theme-init.js` resolve o tema efetivo no carregamento (preferência
+ * salva ou o tema do sistema) e coloca `data-theme="light|dark"` em <html>.
+ * Assim o CSS abaixo é DRY (um bloco de claro + um de escuro), sem "flash".
+ */
+
+/* ===== Fonte Inter (empacotada / self-hosted) =====
+ * Subset latin (cobre acentos do PT-BR), pesos 400/500/600/700, licença SIL OFL.
+ * Empacotada porque o stack `-apple-system`/SF Pro NÃO existe no Windows (caía
+ * pra Segoe UI). Com a Inter local, o visual fica consistente em todo SO.
+ * URLs relativas a este arquivo (raiz da extensão) → pasta `fonts/`. */
+@font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('fonts/inter-latin-400-normal.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 500;
+    font-display: swap;
+    src: url('fonts/inter-latin-500-normal.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 600;
+    font-display: swap;
+    src: url('fonts/inter-latin-600-normal.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url('fonts/inter-latin-700-normal.woff2') format('woff2');
+}
+
+:root {
+    /* ===== Tipografia ===== */
+    /* Inter primeiro (empacotada); demais são fallback caso a fonte não carregue. */
+    --font-ui: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-mono: 'Consolas', 'Courier New', monospace;
+
+    --fs-app-title: 18px;
+    --fs-note-title: 16px;
+    --fs-body: 13px;
+    --fs-ui: 12px;
+    --fs-caption: 11px;
+    --fs-micro: 10px;
+
+    --fw-medium: 500;
+    --fw-semibold: 600;
+    --fw-bold: 700;
+
+    --lh-body: 1.25;
+    /* Tipografia definida no afinador interativo (preview com a Inter real):
+       títulos mais apertados e corpo compacto. */
+    --ls-tight: -0.6px;
+    --ls-body: -0.4px;
+    --ls-label: 0.4px;
+
+    /* ===== TEMA CLARO (padrão) ===== */
+
+    /* Faz os controles nativos (radios, checkboxes, scrollbars) seguirem o tema. */
+    color-scheme: light;
+
+    /* Texto */
+    --text-primary: #1c1c1e;
+    --text-secondary: #6c6c70;
+    --text-muted: #8e8e93;
+    --text-on-accent: #ffffff;
+    --text-placeholder: #b0b0b5;
+
+    /* Texto sobre nota com COR personalizada: o fundo pastel é sempre claro,
+       então o texto fica sempre escuro (NÃO é sobrescrito no tema escuro). */
+    --text-on-colored: #2b2b2b;
+    --text-on-colored-muted: #6b6b6b;
+
+    /* Acento (marca) */
+    --accent: #007aff;
+    --accent-strong: #0062cc;
+    --note-accent: #5856d6;
+    --accent-gradient: linear-gradient(135deg, #007aff, #5856d6);
+
+    /* Superfícies */
+    --bg-app: #ffffff;
+    /* Fundo do app com degradê vertical sutil (pipetado do mock):
+       topo ~#f7f8fa (média dos cantos superiores) → base #ffffff. */
+    --bg-app-gradient: linear-gradient(180deg, #f7f8fa 0%, #ffffff 100%);
+    --bg-surface: #ffffff;
+    --bg-note: #f2f2f7;
+    --bg-input: #f2f2f7;
+    --bg-edit-actions: #f7f7fa;
+    --bg-hover: #eaeaef;
+    --bg-hover-strong: #dedee3;
+
+    /* Botões redondos do cabeçalho (+ / ⋮ / voltar) */
+    --header-btn-bg: #e9e9ee;
+    --header-btn-fg: #6c6c70;
+    --header-btn-bg-hover: #dcdce2;
+
+    /* Bordas */
+    --border: #d1d1d6;
+    --border-subtle: #e5e5ea;
+    --border-strong: #c7c7cc;
+    --border-archived: #c7c7cc;
+
+    /* Sombras */
+    --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.1);
+    --shadow-card-hover: 0 2px 8px rgba(0, 0, 0, 0.15);
+    --shadow-pinned: 0 3px 12px rgba(0, 0, 0, 0.18);
+    --shadow-archived: 0 2px 8px rgba(0, 0, 0, 0.14);
+    --shadow-dropdown: 0 4px 12px rgba(0, 0, 0, 0.15);
+    --shadow-modal: 0 6px 24px rgba(0, 0, 0, 0.25);
+    /* Sombra interna na borda inferior da extensão (profundidade no limite). */
+    --bottom-edge-shadow: inset 0 -7px 6px -6px rgba(0, 0, 0, 0.18);
+
+    /* Diversos */
+    --overlay-bg: rgba(0, 0, 0, 0.35);
+    --selected-bg: #e5f0ff;
+    --search-hl-bg: #b2f2bb;
+    --search-hl-fg: #12522a;
+    --scrollbar-thumb: #c7c7cc;
+    --scrollbar-thumb-hover: #b0b0b5;
+
+    /* Botão de tema (toggle sol/lua) */
+    --toggle-track: #e5e5ea;
+    --toggle-knob: #ffffff;
+    /* Profundidade equilibrada pro claro: elevação forte (cara de botão), mas
+       sulco e curvatura interna aliviados (preto forte "suja" trilho claro). */
+    --toggle-track-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4), inset 0 -1px 1px rgba(255, 255, 255, 0.85);
+    --toggle-knob-shadow: 0 3px 5px rgba(0, 0, 0, 0.45), 0 1px 2px rgba(0, 0, 0, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.9), inset 0 -2px 3px rgba(0, 0, 0, 0.18);
+}
+
+/* ===== TEMA ESCURO ===== */
+:root[data-theme="dark"] {
+    color-scheme: dark;
+
+    /* Texto */
+    --text-primary: #e8e8ea;
+    --text-secondary: #b0b3ba;
+    --text-muted: #82858c;
+    --text-on-accent: #ffffff;
+    --text-placeholder: #6a6d74;
+
+    /* Acento — azul/índigo padronizado com o tema claro (iOS) */
+    --accent: #007aff;
+    --accent-strong: #0062cc;
+    --note-accent: #5856d6;
+    --accent-gradient: linear-gradient(135deg, #007aff, #5856d6);
+
+    /* Superfícies */
+    --bg-app: #1c1c1e;
+    /* Fundo do app com degradê vertical sutil (pipetado do mock):
+       topo ~#27282b (média dos cantos superiores) → base #1c1c1e. */
+    --bg-app-gradient: linear-gradient(180deg, #27282b 0%, #1c1c1e 100%);
+    --bg-surface: #2e3138;
+    --bg-note: #2e3138;
+    --bg-input: #33363d;
+    --bg-edit-actions: #2a2d33;
+    --bg-hover: #3a3d44;
+    --bg-hover-strong: #43464e;
+
+    /* Botões redondos do cabeçalho (⋮ / voltar) — círculo neutro visível */
+    --header-btn-bg: #3a3d44;
+    --header-btn-fg: #b0b3ba;
+    --header-btn-bg-hover: #43464e;
+
+    /* Bordas */
+    --border: #3f434b;
+    --border-subtle: #34373d;
+    --border-strong: #565a62;
+    --border-archived: #4a4d55;
+
+    /* Sombras (mais fortes no escuro) */
+    --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.45);
+    --shadow-card-hover: 0 2px 8px rgba(0, 0, 0, 0.55);
+    --shadow-pinned: 0 3px 12px rgba(0, 0, 0, 0.6);
+    --shadow-archived: 0 2px 8px rgba(0, 0, 0, 0.55);
+    --shadow-dropdown: 0 4px 14px rgba(0, 0, 0, 0.6);
+    --shadow-modal: 0 6px 26px rgba(0, 0, 0, 0.7);
+    /* Sombra interna na borda inferior: mais forte pra aparecer sobre o degradê. */
+    --bottom-edge-shadow: inset 0 -7px 8px -6px rgba(0, 0, 0, 0.55);
+
+    /* Diversos */
+    --overlay-bg: rgba(0, 0, 0, 0.6);
+    --selected-bg: #34414d;
+    --search-hl-bg: #2f6b3a;
+    --search-hl-fg: #d9f7d9;
+    --scrollbar-thumb: #4a4d55;
+    --scrollbar-thumb-hover: #585c65;
+
+    /* Botão de tema */
+    --toggle-track: #3f434b;
+    --toggle-knob: #e8e8ea;
+    /* Sulco bem fundo (preto forte) + borda inferior clara pra marcar o recuo;
+       knob "abaulado": drop shadow dupla (elevação), highlight branco forte no
+       topo e sombra interna inferior marcada (aspecto de domo/peça física). */
+    --toggle-track-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.9), inset 0 -1px 1px rgba(255, 255, 255, 0.06);
+    --toggle-knob-shadow: 0 4px 6px rgba(0, 0, 0, 0.7), 0 1px 2px rgba(0, 0, 0, 0.55), inset 0 2px 2px rgba(255, 255, 255, 0.75), inset 0 -3px 3px rgba(0, 0, 0, 0.32);
+}

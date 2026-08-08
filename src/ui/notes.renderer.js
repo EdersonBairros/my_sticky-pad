@@ -27,7 +27,10 @@ function createNoteElement(note, editingId) {
     if (note.archived) {
         // Arquivada: mantém a cor de fundo, mas a borda cinza + opacidade
         // reduzida (CSS .archived) sinalizam que está "guardada".
-        if (note.color) div.style.backgroundColor = note.color;
+        if (note.color) {
+            div.style.backgroundColor = note.color;
+            div.classList.add('has-color');
+        }
         _buildArchivedNote(div, note);
         return div;
     }
@@ -35,6 +38,8 @@ function createNoteElement(note, editingId) {
     if (note.color && editingId !== note.id) {
         div.style.backgroundColor = note.color;
         div.style.borderLeftColor = darkenColor(note.color, 30);
+        // Fundo pastel é claro em qualquer tema → texto sempre escuro.
+        div.classList.add('has-color');
     }
 
     if (editingId === note.id) {
