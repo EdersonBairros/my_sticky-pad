@@ -61,7 +61,8 @@ function exitToMainView() {
 /** Ajusta o "chrome" (cabeçalho, botões) conforme a tela atual. */
 function _applyViewChrome() {
     const archived = isArchivedView();
-    _v.headerTitle.textContent = archived ? '🗃️ Notas Arquivadas' : '📝 Sticky-Pad';
+    _v.headerTitle.textContent = archived ? '🗃️ Notas Arquivadas' : 'Sticky-Pad';
+    if (_v.headerLogo) _v.headerLogo.classList.toggle('hidden', archived);
     _v.backBtn.classList.toggle('visible', archived);
     // Na tela de arquivados escondemos +, ⋮, a caixa 📦 e o "Limpar tudo".
     _v.headerActions.classList.toggle('hidden', archived);

@@ -1,41 +1,8 @@
 /*
- * ============================================================================
- * SISTEMA TIPOGRÁFICO (uma família só + hierarquia)
- * ============================================================================
- * Filosofia (estilo iOS/Windows nativo): usar UMA família — a Segoe UI, fonte
- * nativa do Windows — e criar hierarquia por TAMANHO, PESO, ENTRELINHA,
- * ESPAÇAMENTO e COR, em vez de misturar fontes. Toda a UI referencia estas
- * variáveis; para reajustar o "tom" da extensão, mexa aqui.
+ * Estilos dos componentes. TODAS as cores e a tipografia vêm de variáveis
+ * definidas em `theme.css` (design tokens, claro + escuro). Este arquivo nunca
+ * usa cor fixa — sempre `var(--token)`.
  */
-:root {
-    --font-ui: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    --font-mono: 'Consolas', 'Courier New', monospace;
-
-    /* Cores de texto */
-    --text-primary: #2b2b2b;
-    --text-secondary: #6b6b6b;
-    --text-muted: #9a9a9a;
-    --text-on-accent: #5f4b00;
-
-    /* Escala de tamanho (popup compacto de 350px) */
-    --fs-app-title: 17px;
-    --fs-note-title: 16px;
-    --fs-body: 14px;
-    --fs-ui: 13px;
-    --fs-caption: 12px;
-    --fs-micro: 11px;
-
-    /* Pesos — regular, médio, semibold e negrito (ênfase) */
-    --fw-regular: 400;
-    --fw-medium: 500;
-    --fw-semibold: 600;
-    --fw-bold: 700;
-
-    /* Entrelinha e espaçamento entre letras */
-    --lh-body: 1.55;
-    --ls-tight: -0.2px;
-    --ls-label: 0.4px;
-}
 
 * {
     margin: 0;
@@ -49,7 +16,8 @@ body {
     min-height: 200px;
     font-family: var(--font-ui);
     color: var(--text-primary);
-    background-color: #f8f9fa;
+    background-color: var(--bg-app); /* fallback */
+    background-image: var(--bg-app-gradient);
     overflow: hidden;
     position: relative;
 }
@@ -60,6 +28,10 @@ body {
     height: 100%;
     min-height: 200px;
     position: relative;
+    /* Sombra interna na borda INFERIOR da extensão: efeito sutil de profundidade
+       no limite da janela (as notas parecem se esconder ao chegar na borda).
+       Fica atrás do conteúdo do rodapé, que continua nítido por cima. */
+    box-shadow: var(--bottom-edge-shadow);
 }
 
 /* ===== RESIZE HANDLES ===== */
@@ -92,18 +64,14 @@ body {
     cursor: ew-resize;
 }
 
+/* Alças de canto (direito): área arrastável invisível. O "canto dobrado" cinza
+   foi removido a pedido — o resize continua funcionando pela área de 16x16px. */
 .resize-handle-corner {
     bottom: 0;
     right: 0;
     width: 16px;
     height: 16px;
     cursor: nwse-resize;
-    background: linear-gradient(135deg, transparent 50%, #999 50%);
-    border-radius: 0 0 4px 0;
-}
-
-.resize-handle-corner:hover {
-    background: linear-gradient(135deg, transparent 50%, #666 50%);
 }
 
 .resize-handle-corner-ne {
@@ -112,12 +80,6 @@ body {
     width: 16px;
     height: 16px;
     cursor: nesw-resize;
-    background: linear-gradient(225deg, transparent 50%, #999 50%);
-    border-radius: 0 4px 0 0;
-}
-
-.resize-handle-corner-ne:hover {
-    background: linear-gradient(225deg, transparent 50%, #666 50%);
 }
 
 .resize-handle-right:hover,
@@ -131,31 +93,48 @@ body {
 
 /* ===== HEADER ===== */
 .header {
-    background-color: #ffd93d;
+    /* Transparente + sem separador: o degradê do fundo (body) flui por baixo,
+       deixando o cabeçalho contínuo com o app (visual do mock, sem "emenda"). */
+    background-color: transparent;
     padding: 12px 16px;
     display: flex;
     justify-content: flex-start;
     align-items: center;
-    border-bottom: 2px solid #f0c929;
+    border-bottom: none;
     flex-shrink: 0;
 }
 
 .header h1 {
     font-size: var(--fs-app-title);
     color: var(--text-primary);
-    font-weight: var(--fw-semibold);
+    /* Bold (700) para o título da extensão "mandar" sobre os títulos das notas
+       (semibold 600) — hierarquia definida no afinador de tipografia. */
+    font-weight: var(--fw-bold);
     letter-spacing: var(--ls-tight);
     /* Empurra o header-actions (+ e ⋮) para a direita; na tela de arquivados
        (actions oculto) mantém título + ⬅️ agrupados à esquerda. */
     margin-right: auto;
 }
 
+/* Logo (ícone SVG) ao lado do título — some na tela de arquivados. */
+.header-logo {
+    width: 24px;
+    height: 24px;
+    display: block;
+    flex-shrink: 0;
+    margin-right: 8px;
+}
+
+.header-logo.hidden {
+    display: none;
+}
+
 .add-btn {
-    width: 32px;
-    height: 32px;
+    width: 30px;
+    height: 30px;
     border: none;
-    background-color: #333;
-    color: #ffd93d;
+    background: var(--accent-gradient);
+    color: var(--text-on-accent);
     font-size: 20px;
     border-radius: 50%;
     cursor: pointer;
@@ -166,8 +145,74 @@ body {
 }
 
 .add-btn:hover {
-    background-color: #555;
+    filter: brightness(1.1);
     transform: scale(1.25);
+}
+
+/* ===== BOTÃO DE TEMA (sol ☀️ ↔ lua 🌙) ===== */
+.theme-toggle {
+    width: 54px;
+    height: 28px;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    border-radius: 14px;
+    background-color: var(--toggle-track);
+    position: relative;
+    flex-shrink: 0;
+    /* Sombra interna dá o aspecto de "sulco" recuado (profundidade de botão).
+       Tokenizada por tema: no escuro o sulco é mais fundo (preto-sobre-escuro
+       some, então precisa de mais opacidade). */
+    box-shadow: var(--toggle-track-shadow);
+    transition: background-color 0.25s ease;
+}
+
+.tt-knob {
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background-color: var(--toggle-knob);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    line-height: 1;
+    /* Elevação do knob, tokenizada por tema. No escuro ganha um brilho no topo
+       (highlight branco) + leve curvatura, pra parecer uma peça polida elevada. */
+    box-shadow: var(--toggle-knob-shadow);
+    /* Desliza + gira (efeito de "rolagem") ao alternar o tema. */
+    transition: transform 0.55s cubic-bezier(0.34, 1.4, 0.5, 1), background-color 0.4s ease;
+}
+
+.theme-toggle.is-dark .tt-knob {
+    transform: translateX(26px) rotate(360deg);
+}
+
+/* Preserva a animação do knob durante a troca de tema — sem isto, a regra
+   `.theme-animating *` (!important) sobrescreveria a transition e o knob
+   "teleportaria" em vez de rolar. */
+.theme-animating .tt-knob {
+    transition: transform 0.55s cubic-bezier(0.34, 1.4, 0.5, 1), background-color 0.4s ease !important;
+}
+
+.tt-moon {
+    display: none;
+}
+
+.theme-toggle.is-dark .tt-sun {
+    display: none;
+}
+
+.theme-toggle.is-dark .tt-moon {
+    display: inline;
+}
+
+/* Transição suave de cores SÓ durante a troca de tema (classe temporária). */
+.theme-animating * {
+    transition: background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease !important;
 }
 
 /* ===== HEADER ACTIONS (add + options) ===== */
@@ -182,11 +227,11 @@ body {
 }
 
 .options-btn {
-    width: 32px;
-    height: 32px;
+    width: 30px;
+    height: 30px;
     border: none;
-    background-color: #333;
-    color: #ffd93d;
+    background-color: var(--header-btn-bg);
+    color: var(--header-btn-fg);
     font-size: 22px;
     line-height: 1;
     border-radius: 50%;
@@ -198,7 +243,7 @@ body {
 }
 
 .options-btn:hover {
-    background-color: #555;
+    background-color: var(--header-btn-bg-hover);
     transform: scale(1.25);
 }
 
@@ -208,10 +253,10 @@ body {
     top: 38px;
     right: 0;
     min-width: 150px;
-    background: #fff;
-    border: 1px solid #ddd;
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
     border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: var(--shadow-dropdown);
     z-index: 200;
     padding: 4px;
 }
@@ -236,7 +281,7 @@ body {
 }
 
 .options-menu-item:hover {
-    background-color: #f0f0f0;
+    background-color: var(--bg-hover);
 }
 
 /* ===== NOTES CONTAINER ===== */
@@ -249,12 +294,12 @@ body {
 
 /* Estilo da nota (modo visualização) */
 .note-item {
-    background-color: #fff;
-    border-left: 4px solid #ffd93d;
+    background-color: var(--bg-note);
+    border-left: 4px solid var(--note-accent);
     border-radius: 6px;
     padding: 10px 12px;
     margin-bottom: 10px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-card);
     position: relative;
     transition: box-shadow 0.2s;
     word-wrap: break-word;
@@ -262,12 +307,12 @@ body {
 }
 
 .note-item:hover {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    box-shadow: var(--shadow-card-hover);
 }
 
 /* Nota fixada (pin): sombra um pouco mais forte para destacar na listagem. */
 .note-item.pinned {
-    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.18);
+    box-shadow: var(--shadow-pinned);
 }
 
 /* ===== COLOR PICKER BUTTON ===== */
@@ -277,8 +322,8 @@ body {
     right: 6px;
     width: 24px;
     height: 24px;
-    border: 1px solid #ddd;
-    background: #fff;
+    border: 1px solid var(--border);
+    background: var(--bg-surface);
     border-radius: 50%;
     cursor: pointer;
     font-size: 13px;
@@ -298,15 +343,15 @@ body {
 }
 
 .color-btn:hover {
-    background-color: #f0f0f0;
-    border-color: #bbb;
+    background-color: var(--bg-hover);
+    border-color: var(--border-strong);
     transform: scale(1.1);
 }
 
 .color-btn.active {
     opacity: 1;
-    background-color: #e8e8e8;
-    border-color: #999;
+    background-color: var(--bg-hover-strong);
+    border-color: var(--border-strong);
 }
 
 /* ===== COLOR PICKER DROPDOWN ===== */
@@ -316,10 +361,10 @@ body {
     top: 32px;
     right: 4px;
     width: 220px;
-    background: #fff;
-    border: 1px solid #ddd;
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
     border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: var(--shadow-dropdown);
     z-index: 30;
     padding: 10px;
 }
@@ -359,19 +404,19 @@ body {
 }
 
 .color-preset.active {
-    border-color: #333;
-    box-shadow: 0 0 0 2px #fff, 0 0 0 4px #333;
+    border-color: var(--text-primary);
+    box-shadow: 0 0 0 2px var(--bg-surface), 0 0 0 4px var(--text-primary);
 }
 
 .color-preset-add {
     width: 32px;
     height: 32px;
     border-radius: 50%;
-    border: 2px dashed #bbb;
+    border: 2px dashed var(--border-strong);
     background: transparent;
     cursor: pointer;
     font-size: 16px;
-    color: #888;
+    color: var(--text-secondary);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -380,14 +425,14 @@ body {
 }
 
 .color-preset-add:hover {
-    border-color: #888;
-    color: #555;
-    background-color: #f5f5f5;
+    border-color: var(--border-strong);
+    color: var(--text-secondary);
+    background-color: var(--bg-hover);
 }
 
 .color-custom-section {
     padding-top: 8px;
-    border-top: 1px solid #eee;
+    border-top: 1px solid var(--border-subtle);
 }
 
 .color-custom-section .color-picker-label {
@@ -406,7 +451,7 @@ body {
     cursor: crosshair;
     display: block;
     margin-bottom: 4px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--border);
 }
 
 .color-preview-bar {
@@ -420,9 +465,9 @@ body {
     width: 18px;
     height: 18px;
     border-radius: 3px;
-    border: 1px solid #ccc;
+    border: 1px solid var(--border);
     flex-shrink: 0;
-    background-color: #fff;
+    background-color: var(--bg-surface);
 }
 
 .color-hex-input-group {
@@ -433,17 +478,18 @@ body {
 .color-hex-input {
     width: 100%;
     padding: 5px 32px 5px 8px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--border);
     border-radius: 4px;
     font-size: var(--fs-caption);
     font-family: var(--font-mono);
     color: var(--text-primary);
+    background-color: var(--bg-input);
     outline: none;
     transition: border-color 0.2s;
 }
 
 .color-hex-input:focus {
-    border-color: #4caf50;
+    border-color: var(--accent);
 }
 
 .color-hex-apply {
@@ -554,7 +600,7 @@ body {
 .note-title-input {
     width: 100%;
     border: none;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid var(--border);
     border-radius: 6px 6px 0 0;
     padding: 10px 12px;
     font-family: var(--font-ui);
@@ -562,19 +608,19 @@ body {
     font-size: var(--fs-note-title);
     letter-spacing: var(--ls-tight);
     color: var(--text-primary);
-    background-color: #fafafa;
+    background-color: var(--bg-edit-actions);
     outline: none;
     transition: background-color 0.2s, border-color 0.2s;
 }
 
 .note-title-input::placeholder {
     font-weight: 400;
-    color: #bbb;
+    color: var(--text-placeholder);
 }
 
 .note-title-input:focus {
-    background-color: #fff;
-    border-bottom-color: #4caf50;
+    background-color: var(--bg-surface);
+    border-bottom-color: var(--accent);
 }
 
 /* ===== TEXTO FORMATADO (Visualização) ===== */
@@ -582,6 +628,7 @@ body {
     font-size: var(--fs-body);
     color: var(--text-primary);
     line-height: var(--lh-body);
+    letter-spacing: var(--ls-body);
     margin-bottom: 4px;
     word-wrap: break-word;
     overflow-wrap: break-word;
@@ -667,6 +714,17 @@ body {
     letter-spacing: 0.2px;
 }
 
+/* Nota com cor personalizada: o fundo pastel é claro em qualquer tema, então o
+   texto (título, corpo, data) fica sempre escuro para permanecer legível. */
+.note-item.has-color .note-title,
+.note-item.has-color .note-text {
+    color: var(--text-on-colored);
+}
+
+.note-item.has-color .note-date {
+    color: var(--text-on-colored-muted);
+}
+
 .note-actions {
     display: flex;
     gap: 6px;
@@ -688,7 +746,7 @@ body {
 }
 
 .note-actions .edit-btn:hover {
-    background-color: #e3f2fd;
+    background-color: var(--selected-bg);
 }
 
 .note-actions .delete-btn:hover {
@@ -697,7 +755,7 @@ body {
 
 /* ===== MODO EDIÇÃO ===== */
 .note-item.editing {
-    border-left-color: #4caf50;
+    border-left-color: var(--accent);
     padding: 0;
     overflow: visible;
 }
@@ -712,8 +770,8 @@ body {
     display: flex;
     gap: 2px;
     padding: 6px 8px;
-    background-color: #f0f0f0;
-    border-bottom: 1px solid #ddd;
+    background-color: var(--bg-hover);
+    border-bottom: 1px solid var(--border);
     flex-wrap: wrap;
     position: sticky;
     top: 0;
@@ -729,7 +787,7 @@ body {
 .format-toolbar .toolbar-group+.toolbar-group {
     margin-left: 4px;
     padding-left: 4px;
-    border-left: 1px solid #ccc;
+    border-left: 1px solid var(--border);
 }
 
 .format-btn {
@@ -744,18 +802,18 @@ body {
     align-items: center;
     justify-content: center;
     transition: all 0.15s;
-    color: #444;
+    color: var(--text-secondary);
 }
 
 .format-btn:hover {
-    background-color: #e0e0e0;
-    border-color: #ccc;
+    background-color: var(--bg-hover-strong);
+    border-color: var(--border);
 }
 
 .format-btn.active {
-    background-color: #d0d0d0;
-    border-color: #999;
-    color: #000;
+    background-color: var(--bg-hover-strong);
+    border-color: var(--border-strong);
+    color: var(--text-primary);
 }
 
 .format-btn .bold-text {
@@ -787,6 +845,7 @@ body {
     font-family: inherit;
     font-size: var(--fs-body);
     line-height: var(--lh-body);
+    letter-spacing: var(--ls-body);
     outline: none;
     overflow-y: auto;
     cursor: text;
@@ -795,12 +854,12 @@ body {
 
 .note-editor:empty:before {
     content: attr(data-placeholder);
-    color: #bbb;
+    color: var(--text-placeholder);
     pointer-events: none;
 }
 
 .note-editor:focus {
-    border-color: #4caf50;
+    border-color: var(--accent);
 }
 
 .note-editor ul,
@@ -820,8 +879,8 @@ body {
     right: 4px;
     width: 28px;
     height: 28px;
-    border: 1px solid #ddd;
-    background: #fff;
+    border: none;
+    background: var(--accent-gradient);
     border-radius: 6px;
     cursor: pointer;
     font-size: 16px;
@@ -836,14 +895,13 @@ body {
 }
 
 .emoji-btn:hover {
-    background-color: #f0f0f0;
-    border-color: #bbb;
+    filter: brightness(1.1);
     transform: scale(1.1);
 }
 
 .emoji-btn.active {
-    background-color: #e8e8e8;
-    border-color: #999;
+    background-color: var(--bg-hover-strong);
+    border-color: var(--border-strong);
 }
 
 /* ===== EMOJI PICKER ===== */
@@ -853,10 +911,10 @@ body {
     right: 4px;
     width: 280px;
     max-height: 220px;
-    background: #fff;
-    border: 1px solid #ddd;
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
     border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: var(--shadow-dropdown);
     z-index: 50;
     overflow: hidden;
 }
@@ -881,8 +939,8 @@ body {
     color: var(--text-secondary);
     text-transform: uppercase;
     letter-spacing: var(--ls-label);
-    background: #f9f9f9;
-    border-bottom: 1px solid #eee;
+    background: var(--bg-hover);
+    border-bottom: 1px solid var(--border-subtle);
     position: sticky;
     top: 0;
     z-index: 1;
@@ -892,8 +950,8 @@ body {
     display: flex;
     gap: 2px;
     padding: 4px 6px;
-    background: #f5f5f5;
-    border-bottom: 1px solid #eee;
+    background: var(--bg-hover);
+    border-bottom: 1px solid var(--border-subtle);
     overflow-x: auto;
     position: sticky;
     top: 0;
@@ -916,12 +974,12 @@ body {
 }
 
 .emoji-cat-btn:hover {
-    background-color: #e0e0e0;
+    background-color: var(--bg-hover-strong);
 }
 
 .emoji-cat-btn.active {
-    background-color: #d0d0d0;
-    border-color: #bbb;
+    background-color: var(--bg-hover-strong);
+    border-color: var(--border-strong);
 }
 
 .emoji-picker-grid {
@@ -948,7 +1006,7 @@ body {
 }
 
 .emoji-item:hover {
-    background-color: #e8e8e8;
+    background-color: var(--bg-hover-strong);
     transform: scale(1.2);
 }
 
@@ -961,7 +1019,7 @@ body {
 }
 
 .emoji-picker-grid::-webkit-scrollbar-thumb {
-    background-color: #ddd;
+    background-color: var(--border);
     border-radius: 2px;
 }
 
@@ -978,7 +1036,7 @@ body {
 }
 
 .category-btn:hover {
-    background-color: #e0e0e0;
+    background-color: var(--bg-hover-strong);
     transform: scale(1.2);
 }
 
@@ -991,10 +1049,10 @@ body {
     position: fixed;
     z-index: 999;
     width: 220px;
-    background: #fff;
-    border: 1px solid #ddd;
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
     border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: var(--shadow-dropdown);
     padding: 10px;
 }
 
@@ -1005,7 +1063,7 @@ body {
     color: var(--text-primary);
     margin-bottom: 8px;
     padding-bottom: 6px;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--border-subtle);
 }
 
 .category-list {
@@ -1030,16 +1088,16 @@ body {
 }
 
 .category-option:hover {
-    background-color: #f5f5f5;
+    background-color: var(--bg-hover);
 }
 
 .category-option.selected {
-    background-color: #e3f2fd;
+    background-color: var(--selected-bg);
     font-weight: 500;
 }
 
 .category-option input[type="radio"] {
-    accent-color: #ffd93d;
+    accent-color: var(--accent);
     cursor: pointer;
     flex-shrink: 0;
 }
@@ -1069,7 +1127,7 @@ body {
     display: flex;
     gap: 6px;
     align-items: center;
-    border-top: 1px solid #eee;
+    border-top: 1px solid var(--border-subtle);
     padding-top: 8px;
 }
 
@@ -1079,16 +1137,17 @@ body {
        "natural" de ~20 chars e empurra o botão ✓ para fora da modal). */
     min-width: 0;
     padding: 6px 8px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--border);
     border-radius: 4px;
     font-size: var(--fs-ui);
     color: var(--text-primary);
+    background-color: var(--bg-input);
     outline: none;
     transition: border-color 0.2s;
 }
 
 .category-input:focus {
-    border-color: #ffd93d;
+    border-color: var(--accent);
 }
 
 .category-check-btn {
@@ -1163,7 +1222,7 @@ body {
 }
 
 .category-undo:hover {
-    background-color: #e3f2fd;
+    background-color: var(--selected-bg);
 }
 
 /* ===== BADGE DA CATEGORIA NA NOTA ===== */
@@ -1179,7 +1238,7 @@ body {
     top: 8px;
     right: 36px;
     display: inline-block;
-    background-color: #ffd93d;
+    background-color: var(--accent);
     color: var(--text-on-accent);
     font-size: var(--fs-micro);
     font-weight: var(--fw-semibold);
@@ -1190,10 +1249,10 @@ body {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-card);
     cursor: default;
     z-index: 4;
-    border: 1px solid #e0c820;
+    border: 1px solid var(--accent-strong);
 }
 
 /* ===== BOTÕES DE AÇÃO (Salvar/Cancelar) ===== */
@@ -1203,8 +1262,8 @@ body {
     justify-content: space-between;
     gap: 6px;
     padding: 8px 12px;
-    border-top: 1px solid #eee;
-    background-color: #fafafa;
+    border-top: 1px solid var(--border-subtle);
+    background-color: var(--bg-edit-actions);
 }
 
 .edit-actions-right {
@@ -1241,11 +1300,11 @@ body {
     justify-content: center;
     font-size: 14px;
     border-radius: 50%;
-    background-color: #f0f0f0;
+    background-color: var(--bg-hover);
 }
 
 .edit-actions .category-btn:hover {
-    background-color: #e0e0e0;
+    background-color: var(--bg-hover-strong);
 }
 
 .edit-actions button:hover {
@@ -1277,11 +1336,11 @@ body {
 /* ===== FOOTER ===== */
 .footer {
     padding: 10px 16px;
-    border-top: 1px solid #e0e0e0;
+    border-top: none;
     display: flex;
     justify-content: flex-start;
     align-items: center;
-    background-color: #fff;
+    background-color: transparent;
     flex-shrink: 0;
     gap: 8px;
 }
@@ -1304,12 +1363,12 @@ body {
 .search-input {
     max-width: 100%;
     padding: 5px 26px 5px 10px;
-    border: 1px solid #ddd;
+    border: 1px solid var(--border);
     border-radius: 8px;
     font-family: var(--font-ui);
     font-size: var(--fs-caption);
     color: var(--text-primary);
-    background-color: #f6f6f6;
+    background-color: var(--bg-input);
     outline: none;
     transition: border-color 0.2s, background-color 0.2s;
 }
@@ -1319,8 +1378,8 @@ body {
 }
 
 .search-input:focus {
-    border-color: #ffd93d;
-    background-color: #fff;
+    border-color: var(--accent);
+    background-color: var(--bg-surface);
 }
 
 .search-clear {
@@ -1334,8 +1393,8 @@ body {
     width: 18px;
     height: 18px;
     border: none;
-    background: #e0e0e0;
-    color: #666;
+    background: var(--bg-hover-strong);
+    color: var(--text-secondary);
     border-radius: 50%;
     cursor: pointer;
     font-size: 10px;
@@ -1349,14 +1408,14 @@ body {
 }
 
 .search-clear:hover {
-    background: #ccc;
-    color: #333;
+    background: var(--bg-hover);
+    color: var(--text-primary);
 }
 
 /* Grifo do termo encontrado na busca */
 .search-hl {
-    background-color: #b2f2bb;
-    color: #12522a;
+    background-color: var(--search-hl-bg);
+    color: var(--search-hl-fg);
     border-radius: 2px;
     padding: 0 1px;
 }
@@ -1388,7 +1447,7 @@ body {
 }
 
 .archive-box-btn:hover {
-    background-color: #f0f0f0;
+    background-color: var(--bg-hover);
     transform: scale(1.12);
 }
 
@@ -1398,8 +1457,8 @@ body {
     align-items: center;
     gap: 4px;
     border: none;
-    background-color: #333;
-    color: #ffd93d;
+    background-color: var(--header-btn-bg);
+    color: var(--header-btn-fg);
     cursor: pointer;
     font-family: var(--font-ui);
     font-size: var(--fs-ui);
@@ -1416,7 +1475,7 @@ body {
 }
 
 .back-btn:hover {
-    background-color: #555;
+    background-color: var(--header-btn-bg-hover);
     transform: translateX(-2px);
 }
 
@@ -1433,7 +1492,7 @@ body {
 }
 
 /* Hovers das ações dos cards. */
-.note-actions .archive-btn:hover { background-color: #fff3cd; }
+.note-actions .archive-btn:hover { background-color: var(--bg-surface)3cd; }
 
 /* Botão restaurar: ícone SVG monocromático (setas circulares), verde no hover. */
 .restore-btn {
@@ -1468,25 +1527,26 @@ body {
     color: #c0392b;
 }
 
-/* Fundo "gaveta" da tela de arquivados: cinza suave para os cards se destacarem
-   (sem mexer na opacidade/cor do texto, que prejudicava notas coloridas). */
+/* Tela de arquivados: fundo transparente para fluir com o degradê do app
+   (igual à tela principal). O "guardado" segue sinalizado pela borda cinza +
+   sombra dos próprios cards (.note-item.archived), sem precisar do bloco cinza. */
 body.archived-view .notes-container {
-    background-color: #e3e4e0;
+    background-color: transparent;
 }
 
 /* Card de nota arquivada: borda cinza sutil + sombra para "flutuar" sobre o
    fundo cinza (visual "guardado" sem perder legibilidade). */
 .note-item.archived {
-    border-left: 4px solid #c4c4c4;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.14);
+    border-left: 4px solid var(--border-archived);
+    box-shadow: var(--shadow-archived);
 }
 
 /* Micro-texto discreto sobre a caixa (quando não há arquivadas). */
 .box-tooltip {
     position: fixed;
     transform: translate(-50%, -100%);
-    background: #333;
-    color: #fff;
+    background: var(--text-primary);
+    color: var(--bg-app);
     font-size: var(--fs-micro);
     padding: 3px 8px;
     border-radius: 4px;
@@ -1552,7 +1612,7 @@ body.archived-view .notes-container {
 .confirm-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.35);
+    background: var(--overlay-bg);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1567,11 +1627,11 @@ body.archived-view .notes-container {
 }
 
 .confirm-box {
-    background: #fff;
+    background: var(--bg-surface);
     border-radius: 8px;
-    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.25);
-    padding: 16px;
-    max-width: 280px;
+    box-shadow: var(--shadow-modal);
+    padding: 12px 14px;
+    max-width: 235px;
     width: 100%;
     transform: scale(0.95);
     transition: transform 0.15s ease;
@@ -1582,10 +1642,10 @@ body.archived-view .notes-container {
 }
 
 .confirm-message {
-    font-size: var(--fs-body);
+    font-size: var(--fs-ui);
     color: var(--text-primary);
-    line-height: var(--lh-body);
-    margin-bottom: 14px;
+    line-height: 1.4;
+    margin-bottom: 10px;
 }
 
 .confirm-actions {
@@ -1596,10 +1656,10 @@ body.archived-view .notes-container {
 
 .confirm-actions button {
     border: none;
-    padding: 6px 14px;
+    padding: 5px 12px;
     border-radius: 4px;
     cursor: pointer;
-    font-size: var(--fs-ui);
+    font-size: var(--fs-caption);
     font-weight: var(--fw-medium);
     transition: opacity 0.2s;
 }
@@ -1609,7 +1669,7 @@ body.archived-view .notes-container {
 }
 
 .confirm-cancel {
-    background-color: #e0e0e0;
+    background-color: var(--bg-hover-strong);
     color: var(--text-primary);
 }
 
@@ -1628,12 +1688,12 @@ body.archived-view .notes-container {
 }
 
 .notes-container::-webkit-scrollbar-thumb {
-    background-color: #ccc;
+    background-color: var(--scrollbar-thumb);
     border-radius: 3px;
 }
 
 .notes-container::-webkit-scrollbar-thumb:hover {
-    background-color: #aaa;
+    background-color: var(--scrollbar-thumb-hover);
 }
 
 .note-editor::-webkit-scrollbar {
@@ -1645,12 +1705,12 @@ body.archived-view .notes-container {
 }
 
 .note-editor::-webkit-scrollbar-thumb {
-    background-color: #ddd;
+    background-color: var(--border);
     border-radius: 3px;
 }
 
 .note-editor::-webkit-scrollbar-thumb:hover {
-    background-color: #bbb;
+    background-color: var(--scrollbar-thumb-hover);
 }
 
 .emoji-picker-grid::-webkit-scrollbar {
@@ -1662,6 +1722,6 @@ body.archived-view .notes-container {
 }
 
 .emoji-picker-grid::-webkit-scrollbar-thumb {
-    background-color: #ddd;
+    background-color: var(--border);
     border-radius: 2px;
 }

@@ -18,8 +18,10 @@ async function bootstrap() {
         searchClearBtn: document.getElementById('searchClearBtn'),
         backBtn: document.getElementById('backBtn'),
         headerTitle: document.getElementById('headerTitle'),
+        headerLogo: document.getElementById('headerLogo'),
         headerActions: document.getElementById('headerActions'),
-        archiveBoxBtn: document.getElementById('archiveBoxBtn')
+        archiveBoxBtn: document.getElementById('archiveBoxBtn'),
+        themeToggle: document.getElementById('themeToggle')
     };
 
     // O armazenamento é assíncrono (chrome.storage.local). Carregamos notas,
@@ -60,11 +62,14 @@ async function bootstrap() {
         archiveBoxBtn: $.archiveBoxBtn,
         backBtn: $.backBtn,
         headerTitle: $.headerTitle,
+        headerLogo: $.headerLogo,
         headerActions: $.headerActions,
         clearAllBtn: $.clearAllBtn,
         notesContainer: $.notesContainer,
         noteCount: $.noteCount
     });
+
+    initThemeToggle($.themeToggle);
 
     $.addNoteBtn.addEventListener('click', () => handleAddNote());
     $.clearAllBtn.addEventListener('click', () => handleClearAllNotes());
