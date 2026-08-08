@@ -4,6 +4,13 @@
  */
 
 /**
+ * Ícone SVG de lixeira (lata clássica com tampa, alça e frisos). A cor da lata
+ * vem de `currentColor` (definida no CSS de `.delete-btn`); os frisos são
+ * brancos. Definido uma vez e reutilizado nos cards (principal e arquivado).
+ */
+const TRASH_ICON_SVG = `<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M10.4 3.6C10.4 2.7 11.1 2.1 12 2.1s1.6.6 1.6 1.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><ellipse cx="12" cy="6" rx="7.2" ry="1.9" fill="currentColor"/><path d="M5.3 6h13.4l-1.2 13.8c-.1 1.1-2.5 1.9-5.5 1.9s-5.4-.8-5.5-1.9L5.3 6z" fill="currentColor"/><g stroke="#fff" stroke-width="1" stroke-linecap="round" opacity="0.9"><line x1="9.3" y1="9" x2="9.6" y2="18.4"/><line x1="12" y1="9" x2="12" y2="18.6"/><line x1="14.7" y1="9" x2="14.4" y2="18.4"/></g></svg>`;
+
+/**
  * Cria o elemento DOM completo de uma nota (modo edição ou visualização).
  * @param {object} note - Dados da nota
  * @param {string|null} editingId - ID da nota em edição (null se nenhuma)
@@ -13,8 +20,17 @@ function createNoteElement(note, editingId) {
     const div = document.createElement('div');
     div.className = 'note-item'
         + (editingId === note.id ? ' editing' : '')
-        + (note.pinned ? ' pinned' : '');
+        + (note.pinned ? ' pinned' : '')
+        + (note.archived ? ' archived' : '');
     div.dataset.id = note.id;
+
+    if (note.archived) {
+        // Arquivada: mantém a cor de fundo, mas a borda cinza + opacidade
+        // reduzida (CSS .archived) sinalizam que está "guardada".
+        if (note.color) div.style.backgroundColor = note.color;
+        _buildArchivedNote(div, note);
+        return div;
+    }
 
     if (note.color && editingId !== note.id) {
         div.style.backgroundColor = note.color;
@@ -28,6 +44,28 @@ function createNoteElement(note, editingId) {
     }
 
     return div;
+}
+
+/**
+ * Monta o card de uma nota ARQUIVADA (read-only): categoria + título (sem pin) +
+ * corpo + data, e rodapé com Restaurar (↩️) e Excluir definitivo (🗑️).
+ * @private
+ * @param {HTMLElement} div
+ * @param {object} note
+ */
+function _buildArchivedNote(div, note) {
+    div.innerHTML = `
+        ${note.category ? `<span class="note-category-badge">${escapeHtml(note.category)}</span>` : ''}
+        ${note.title ? `<div class="note-head"><span class="note-title">${escapeHtml(note.title)}</span></div>` : ''}
+        <div class="note-text">${sanitizeHtml(note.text || '')}</div>
+        <div class="note-footer">
+            <span class="note-date">${formatDate(note.createdAt)}</span>
+            <div class="note-actions">
+                <button class="restore-btn" data-action="restore" title="Restaurar nota" aria-label="Restaurar nota"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="23 4 23 10 17 10"></polyline><polyline points="1 20 1 14 7 14"></polyline><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path></svg></button>
+                <button class="delete-btn" data-action="delete" title="Excluir definitivamente" aria-label="Excluir definitivamente">${TRASH_ICON_SVG}</button>
+            </div>
+        </div>
+    `;
 }
 
 /**
@@ -121,7 +159,8 @@ function _buildViewNote(div, note) {
             <span class="note-date">${formatDate(note.createdAt)}</span>
             <div class="note-actions">
                 <button class="edit-btn" data-action="edit" title="Editar">✏️</button>
-                <button class="delete-btn" data-action="delete" title="Excluir">🗑️</button>
+                <button class="archive-btn" data-action="archive" title="Arquivar nota">🗂️</button>
+                <button class="delete-btn" data-action="delete" title="Excluir" aria-label="Excluir">${TRASH_ICON_SVG}</button>
             </div>
         </div>
     `;
@@ -137,25 +176,38 @@ function _buildViewNote(div, note) {
  */
 function renderNotes(notesContainer, editingId) {
     notesContainer.innerHTML = '';
-    const allNotes = getNotes();
 
-    if (allNotes.length === 0) {
-        notesContainer.innerHTML = `
-            <div class="empty-state">
-                <div class="empty-icon">📋</div>
-                <p>Nenhum lembrete ainda.<br>Clique no <strong>+</strong> para adicionar!</p>
-            </div>
-        `;
+    // Filtro por tela: a principal mostra as NÃO-arquivadas; a caixa (arquivados)
+    // mostra apenas as arquivadas.
+    const archivedView = (typeof isArchivedView === 'function') && isArchivedView();
+    const viewNotes = getNotes().filter(n => archivedView ? n.archived === true : !n.archived);
+
+    if (viewNotes.length === 0) {
+        if (archivedView) {
+            notesContainer.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">🗃️</div>
+                    <p>Sua gaveta de arquivos está limpa e vazia.</p>
+                </div>
+            `;
+        } else {
+            notesContainer.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">📋</div>
+                    <p>Nenhum lembrete ainda.<br>Clique no <strong>+</strong> para adicionar!</p>
+                </div>
+            `;
+        }
         return;
     }
 
     // Filtro de busca (case- e acento-insensível) em título, categoria e corpo.
     // A nota em edição sempre aparece, para não sumir enquanto está sendo escrita.
     const term = (typeof getSearchTerm === 'function') ? getSearchTerm() : '';
-    let notes = allNotes;
+    let notes = viewNotes;
     if (term) {
         const nterm = normalizeForSearch(term);
-        notes = allNotes.filter(n => n.id === editingId || _noteMatches(n, nterm));
+        notes = viewNotes.filter(n => n.id === editingId || _noteMatches(n, nterm));
     }
 
     if (notes.length === 0) {
@@ -251,6 +303,12 @@ function _highlightNote(el, term) {
  */
 function updateNoteCount(noteCountElement) {
     if (!noteCountElement) return;
-    const count = getNotes().length;
-    noteCountElement.textContent = count === 1 ? '1 lembrete' : `${count} lembretes`;
+    // Conta apenas as notas da tela atual (principal x arquivados).
+    const archivedView = (typeof isArchivedView === 'function') && isArchivedView();
+    const count = getNotes().filter(n => archivedView ? n.archived === true : !n.archived).length;
+    if (archivedView) {
+        noteCountElement.textContent = count === 1 ? '1 arquivada' : `${count} arquivadas`;
+    } else {
+        noteCountElement.textContent = count === 1 ? '1 lembrete' : `${count} lembretes`;
+    }
 }

@@ -134,7 +134,7 @@ body {
     background-color: #ffd93d;
     padding: 12px 16px;
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: center;
     border-bottom: 2px solid #f0c929;
     flex-shrink: 0;
@@ -145,6 +145,9 @@ body {
     color: var(--text-primary);
     font-weight: var(--fw-semibold);
     letter-spacing: var(--ls-tight);
+    /* Empurra o header-actions (+ e ⋮) para a direita; na tela de arquivados
+       (actions oculto) mantém título + ⬅️ agrupados à esquerda. */
+    margin-right: auto;
 }
 
 .add-btn {
@@ -1368,6 +1371,164 @@ body {
     animation: search-fade-in 0.22s ease;
 }
 
+/* ===== NOTAS ARQUIVADAS ===== */
+
+/* Botão caixa 📦 no rodapé (empurra o grupo [📦][Limpar tudo] para a direita). */
+.archive-box-btn {
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 15px;
+    line-height: 1;
+    padding: 4px 6px;
+    border-radius: 4px;
+    flex-shrink: 0;
+    margin-left: auto;
+    transition: background-color 0.15s, transform 0.15s;
+}
+
+.archive-box-btn:hover {
+    background-color: #f0f0f0;
+    transform: scale(1.12);
+}
+
+/* Botão Voltar (⬅️) no cabeçalho — oculto por padrão, aparece nos arquivados. */
+.back-btn {
+    display: none;
+    align-items: center;
+    gap: 4px;
+    border: none;
+    background-color: #333;
+    color: #ffd93d;
+    cursor: pointer;
+    font-family: var(--font-ui);
+    font-size: var(--fs-ui);
+    font-weight: var(--fw-medium);
+    line-height: 1;
+    padding: 6px 12px;
+    margin-right: 8px;
+    border-radius: 6px;
+    transition: background-color 0.15s, transform 0.15s;
+}
+
+.back-btn.visible {
+    display: inline-flex;
+}
+
+.back-btn:hover {
+    background-color: #555;
+    transform: translateX(-2px);
+}
+
+.back-arrow {
+    font-size: 15px;
+    line-height: 1;
+}
+
+/* Elementos ocultos na tela de arquivados. */
+.header-actions.hidden,
+.archive-box-btn.hidden,
+.clear-btn.hidden {
+    display: none;
+}
+
+/* Hovers das ações dos cards. */
+.note-actions .archive-btn:hover { background-color: #fff3cd; }
+
+/* Botão restaurar: ícone SVG monocromático (setas circulares), verde no hover. */
+.restore-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #14b8a6;
+}
+
+.restore-btn svg {
+    display: block;
+}
+
+.note-actions .restore-btn:hover {
+    background-color: #d9f5f0;
+    color: #0d9488;
+}
+
+/* Botão excluir: ícone SVG de lixeira (lata clássica), vermelho. */
+.delete-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #e2504a;
+}
+
+.delete-btn svg {
+    display: block;
+}
+
+.note-actions .delete-btn:hover {
+    color: #c0392b;
+}
+
+/* Fundo "gaveta" da tela de arquivados: cinza suave para os cards se destacarem
+   (sem mexer na opacidade/cor do texto, que prejudicava notas coloridas). */
+body.archived-view .notes-container {
+    background-color: #e3e4e0;
+}
+
+/* Card de nota arquivada: borda cinza sutil + sombra para "flutuar" sobre o
+   fundo cinza (visual "guardado" sem perder legibilidade). */
+.note-item.archived {
+    border-left: 4px solid #c4c4c4;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.14);
+}
+
+/* Micro-texto discreto sobre a caixa (quando não há arquivadas). */
+.box-tooltip {
+    position: fixed;
+    transform: translate(-50%, -100%);
+    background: #333;
+    color: #fff;
+    font-size: var(--fs-micro);
+    padding: 3px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+    z-index: 1000;
+}
+
+.box-tooltip.visible {
+    opacity: 1;
+}
+
+/* A caixa treme quando não há arquivadas (reusa o keyframe category-shake). */
+.archive-box-btn.shake {
+    animation: category-shake 0.4s ease;
+}
+
+/* Transição suave entre as telas (principal ↔ arquivados). */
+@keyframes view-in {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.notes-container.view-transition {
+    animation: view-in 0.25s ease;
+}
+
+/* Saída do card ao arquivar: fade + leve slide para a direita. */
+@keyframes archive-out {
+    to {
+        opacity: 0;
+        transform: translateX(28px);
+    }
+}
+
+.note-item.archiving-out {
+    animation: archive-out 0.25s ease forwards;
+    pointer-events: none;
+}
+
 .clear-btn {
     border: none;
     background: none;
@@ -1380,9 +1541,6 @@ body {
     transition: background-color 0.2s, transform 0.15s;
     flex-shrink: 0;
     white-space: nowrap;
-    /* Empurra o "Limpar tudo" para a extrema direita, deixando contador + busca
-       agrupados à esquerda. */
-    margin-left: auto;
 }
 
 .clear-btn:hover {

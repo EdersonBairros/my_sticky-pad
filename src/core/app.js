@@ -15,17 +15,24 @@ async function bootstrap() {
         importFileInput: document.getElementById('importFileInput'),
         noteCount: document.getElementById('noteCount'),
         searchInput: document.getElementById('searchInput'),
-        searchClearBtn: document.getElementById('searchClearBtn')
+        searchClearBtn: document.getElementById('searchClearBtn'),
+        backBtn: document.getElementById('backBtn'),
+        headerTitle: document.getElementById('headerTitle'),
+        headerActions: document.getElementById('headerActions'),
+        archiveBoxBtn: document.getElementById('archiveBoxBtn')
     };
 
-    // O armazenamento agora é assíncrono (chrome.storage.local). Aguardamos as
-    // cargas antes de renderizar para que os caches em memória estejam prontos.
-    await initStorage(() => {
-        renderNotes($.notesContainer, getEditingId());
-        updateNoteCount($.noteCount);
-    });
-    await initCategories();
-    await initFavoriteEmojis();
+    // O armazenamento é assíncrono (chrome.storage.local). Carregamos notas,
+    // categorias e favoritos EM PARALELO (Promise.all) para a tela abrir mais
+    // rápido — em vez de aguardar as três leituras em sequência.
+    await Promise.all([
+        initStorage(() => {
+            renderNotes($.notesContainer, getEditingId());
+            updateNoteCount($.noteCount);
+        }),
+        initCategories(),
+        initFavoriteEmojis()
+    ]);
 
     // Limpeza defensiva: remove notas em branco herdadas de versões anteriores
     // ao fix do bug "Nota em branco".
@@ -47,6 +54,16 @@ async function bootstrap() {
         input: $.searchInput,
         clearBtn: $.searchClearBtn,
         notesContainer: $.notesContainer
+    });
+
+    initViews({
+        archiveBoxBtn: $.archiveBoxBtn,
+        backBtn: $.backBtn,
+        headerTitle: $.headerTitle,
+        headerActions: $.headerActions,
+        clearAllBtn: $.clearAllBtn,
+        notesContainer: $.notesContainer,
+        noteCount: $.noteCount
     });
 
     $.addNoteBtn.addEventListener('click', () => handleAddNote());
@@ -78,6 +95,8 @@ function _initActionDispatcher(container) {
         switch (target.dataset.action) {
             case 'edit': startEditing(id); break;
             case 'delete': handleDeleteNote(id); break;
+            case 'archive': handleArchiveNote(id); break;
+            case 'restore': handleRestoreNote(id); break;
             case 'pin-toggle': togglePin(id); break;
             case 'save': saveEditing(id); break;
             case 'cancel': handleCancelEditing(); break;
