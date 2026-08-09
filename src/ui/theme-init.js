@@ -18,3 +18,13 @@
         document.documentElement.setAttribute('data-theme', 'light');
     }
 })();
+
+// Modo JANELA: quando aberto via "Abrir em janela" (?mode=window), aplica o
+// layout fluido ANTES do paint (o body preenche a janela do SO). Ver .window-mode.
+(function () {
+    try {
+        if (location.search.indexOf('mode=window') !== -1) {
+            document.documentElement.classList.add('window-mode');
+        }
+    } catch (e) { /* querystring é opcional */ }
+})();

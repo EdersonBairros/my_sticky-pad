@@ -5,8 +5,8 @@
 
 let _resizeState = {
     isResizing: false,
-    startX: 0, startY: 0,
-    startWidth: 0, startHeight: 0,
+    startY: 0,
+    startHeight: 0,
     currentHandle: null,
     rafId: null
 };
@@ -25,9 +25,11 @@ function initResize() {
             const s = _resizeState;
             s.isResizing = true;
             s.currentHandle = this;
-            s.startX = e.clientX;
-            s.startY = e.clientY;
-            s.startWidth = window.innerWidth || document.body.offsetWidth;
+            // Coordenada de TELA (screenY), não de viewport (clientY): ao
+            // redimensionar, a janela do popup se move e reposicionava o viewport,
+            // o que criava um loop de crescimento. screenY é absoluto à tela.
+            // Só resize vertical — a largura é fixa (350px).
+            s.startY = e.screenY;
             s.startHeight = window.innerHeight || document.body.offsetHeight;
 
             document.body.style.userSelect = 'none';
@@ -52,27 +54,10 @@ function _onMouseMove(e) {
 
 function _performResize(e) {
     const s = _resizeState;
-    const dir = s.currentHandle.dataset.resize;
-    let newWidth = s.startWidth;
-    let newHeight = s.startHeight;
-
-    const dx = e.clientX - s.startX;
-    const dy = e.clientY - s.startY;
-
-    if (dir === 'right' || dir === 'se' || dir === 'ne') {
-        newWidth = Math.min(RESIZE_LIMITS.MAX_WIDTH, Math.max(RESIZE_LIMITS.MIN_WIDTH, s.startWidth + dx));
-    }
-    if (dir === 'left') {
-        newWidth = Math.min(RESIZE_LIMITS.MAX_WIDTH, Math.max(RESIZE_LIMITS.MIN_WIDTH, s.startWidth - dx));
-    }
-    if (dir === 'bottom' || dir === 'se') {
-        newHeight = Math.min(RESIZE_LIMITS.MAX_HEIGHT, Math.max(RESIZE_LIMITS.MIN_HEIGHT, s.startHeight + dy));
-    }
-    if (dir === 'ne') {
-        newHeight = Math.min(RESIZE_LIMITS.MAX_HEIGHT, Math.max(RESIZE_LIMITS.MIN_HEIGHT, s.startHeight - dy));
-    }
-
-    document.body.style.width = newWidth + 'px';
+    // Só a borda inferior redimensiona (vertical). A largura fica fixa (350px):
+    // o popup do Chrome é ancorado no topo-direito e o resize horizontal quebra.
+    const dy = e.screenY - s.startY;
+    const newHeight = Math.min(RESIZE_LIMITS.MAX_HEIGHT, Math.max(RESIZE_LIMITS.MIN_HEIGHT, s.startHeight + dy));
     document.body.style.height = newHeight + 'px';
 }
 
@@ -83,22 +68,11 @@ function _onMouseUp() {
         if (s.rafId) { cancelAnimationFrame(s.rafId); s.rafId = null; }
         document.body.style.userSelect = '';
         document.documentElement.style.userSelect = '';
-        savePopupSize(
-            window.innerWidth || document.body.offsetWidth,
-            window.innerHeight || document.body.offsetHeight
-        );
+        savePopupSize(window.innerHeight || document.body.offsetHeight);
         s.currentHandle = null;
         document.removeEventListener('mousemove', _onMouseMove);
         document.removeEventListener('mouseup', _onMouseUp);
     }
 }
 
-/**
- * Redimensiona o popup para valores específicos.
- * @param {number} w - Largura
- * @param {number} h - Altura
- */
-function setPopupSize(w, h) {
-    document.body.style.width = Math.min(RESIZE_LIMITS.MAX_WIDTH, Math.max(RESIZE_LIMITS.MIN_WIDTH, w)) + 'px';
-    document.body.style.height = Math.min(RESIZE_LIMITS.MAX_HEIGHT, Math.max(RESIZE_LIMITS.MIN_HEIGHT, h)) + 'px';
-}
+// (setPopupSize removido: largura é fixa e a altura é aplicada em loadPopupSize.)

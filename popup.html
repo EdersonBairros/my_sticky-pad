@@ -13,11 +13,10 @@
 
 <body>
     <div class="container">
-        <div class="resize-handle resize-handle-right" data-resize="right"></div>
+        <!-- Só resize vertical: a largura é fixa (350px) porque o popup do Chrome
+             é ancorado no topo-direito e o resize horizontal quebra. Liberdade
+             total de redimensionamento fica no "Abrir em janela" (menu ⋮). -->
         <div class="resize-handle resize-handle-bottom" data-resize="bottom"></div>
-        <div class="resize-handle resize-handle-corner" data-resize="se"></div>
-        <div class="resize-handle resize-handle-corner-ne" data-resize="ne"></div>
-        <div class="resize-handle resize-handle-left" data-resize="left"></div>
         <div class="header">
             <button id="backBtn" class="back-btn" title="Voltar para a tela principal" aria-label="Voltar"><span class="back-arrow" aria-hidden="true">←</span> Voltar</button>
             <img id="headerLogo" class="header-logo" src="icons/sticky_pad_icon.svg" alt="" aria-hidden="true">
@@ -27,6 +26,9 @@
                     <span class="tt-knob"><span class="tt-sun">☀️</span><span class="tt-moon">🌙</span></span>
                 </button>
                 <button id="addNoteBtn" class="add-btn" title="Adicionar novo lembrete">+</button>
+                <button id="openWindowBtn" class="window-btn" type="button" title="Janela flutuante" aria-label="Janela flutuante">
+                    <span class="window-btn-icon" aria-hidden="true"></span>
+                </button>
                 <div class="options-wrap">
                     <button id="optionsBtn" class="options-btn" title="Mais opções">⋮</button>
                     <div id="optionsMenu" class="options-menu">
