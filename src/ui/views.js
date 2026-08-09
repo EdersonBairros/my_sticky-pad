@@ -33,9 +33,9 @@ function enterArchivedView() {
 
     const hasArchived = getNotes().some(n => n.archived === true);
     if (!hasArchived) {
-        // Sem arquivadas: treme a caixa + micro-texto por 1s e permanece.
+        // Sem arquivadas: treme a caixa + toast (padronizado com os demais botões).
         _shakeArchiveBox();
-        _showBoxTooltip('Nenhuma nota arquivada');
+        showToast('Nenhuma nota arquivada.', 'warning');
         return;
     }
 
@@ -88,24 +88,4 @@ function _shakeArchiveBox() {
     void btn.offsetWidth;
     btn.classList.add('shake');
     setTimeout(() => btn.classList.remove('shake'), 500);
-}
-
-/** Mostra um micro-texto discreto sobre a caixa por ~1s. */
-function _showBoxTooltip(text) {
-    const old = document.querySelector('.box-tooltip');
-    if (old) old.remove();
-
-    const rect = _v.archiveBoxBtn.getBoundingClientRect();
-    const tip = document.createElement('div');
-    tip.className = 'box-tooltip';
-    tip.textContent = text;
-    document.body.appendChild(tip);
-    tip.style.left = (rect.left + rect.width / 2) + 'px';
-    tip.style.top = (rect.top - 6) + 'px';
-
-    requestAnimationFrame(() => tip.classList.add('visible'));
-    setTimeout(() => {
-        tip.classList.remove('visible');
-        setTimeout(() => tip.remove(), 200);
-    }, 1000);
 }

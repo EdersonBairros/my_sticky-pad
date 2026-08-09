@@ -82,6 +82,7 @@ async function bootstrap() {
     $.supportBtn.addEventListener('click', () => openSupportModal());
     $.clearAllBtn.addEventListener('click', () => handleClearAllNotes());
 
+    _initButtonClickGuard();
     _initActionDispatcher($.notesContainer);
     _initToolbarDispatcher($.notesContainer);
     _initEmojiDispatchers($.notesContainer);
@@ -119,6 +120,12 @@ function _initActionDispatcher(container) {
             case 'toggle-custom': _toggleCustomColor(item); break;
             case 'apply-hex': _applyHexInput(item, id); break;
             case 'category-toggle':
+                // Giro suave da engrenagem: só inicia se não estiver girando, e a
+                // classe sai quando a animação termina (nunca corta no meio).
+                if (!target.classList.contains('spin')) {
+                    target.classList.add('spin');
+                    target.addEventListener('animationend', () => target.classList.remove('spin'), { once: true });
+                }
                 // Toggle: se o modal já está aberto, fecha; senão, abre.
                 if (document.querySelector('.category-modal')) {
                     closeCategoryModal();
@@ -211,6 +218,28 @@ function _initGlobalCloseDispatchers() {
         if (!e.target.closest('.color-picker-dropdown') && !e.target.closest('.color-btn')) closeColorPickers();
         if (!e.target.closest('.category-modal') && !e.target.closest('[data-action="category-toggle"]')) closeCategoryModal();
     });
+}
+
+/**
+ * Trava anti-duplo-clique GLOBAL: ignora cliques repetidos no MESMO botão dentro
+ * de ~400ms, evitando disparar a ação/alerta duas vezes ao clicar rápido (ex.:
+ * spammar o "Esvaziar" empilhava vários toasts). Roda na fase de CAPTURA, então
+ * bloqueia ANTES dos handlers do botão (inclusive os delegados). Botões de
+ * interação rápida (emoji e toolbar de formatação) ficam de fora de propósito.
+ */
+function _initButtonClickGuard() {
+    document.addEventListener('click', function (e) {
+        const btn = e.target.closest('button');
+        if (!btn) return;
+        if (btn.closest('.emoji-picker') || btn.classList.contains('format-btn')) return;
+        const now = Date.now();
+        if (btn._lastClickTs && now - btn._lastClickTs < 400) {
+            e.stopImmediatePropagation();
+            e.preventDefault();
+            return;
+        }
+        btn._lastClickTs = now;
+    }, true);
 }
 
 function _initEditorEvents() {

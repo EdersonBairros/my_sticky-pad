@@ -19,7 +19,7 @@ function showToast(message, type) {
     toast.textContent = message;
     toast.style.cssText = `
         position: fixed;
-        bottom: 16px;
+        bottom: 58px;
         left: 50%;
         transform: translateX(-50%) translateY(80px);
         background: ${type === 'error' ? '#f44336' : type === 'warning' ? '#ff9800' : '#4caf50'};

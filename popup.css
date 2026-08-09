@@ -802,16 +802,12 @@ html.window-mode #openWindowBtn {
     transition: background-color 0.2s, transform 0.15s;
 }
 
+/* Hover PADRONIZADO de todos os botões de ação da nota (editar/arquivar/
+   restaurar/excluir): mesmo realce de fundo + mesma ampliação. As cores de
+   ícone específicas (excluir vermelho, restaurar teal) ficam mais abaixo. */
 .note-actions button:hover {
     transform: scale(1.35);
-}
-
-.note-actions .edit-btn:hover {
-    background-color: var(--selected-bg);
-}
-
-.note-actions .delete-btn:hover {
-    background-color: #ffebee;
+    background-color: var(--bg-hover);
 }
 
 /* ===== MODO EDIÇÃO ===== */
@@ -830,7 +826,7 @@ html.window-mode #openWindowBtn {
 .format-toolbar {
     display: flex;
     gap: 2px;
-    padding: 6px 8px;
+    padding: 3px 8px;
     background-color: var(--bg-hover);
     border-bottom: 1px solid var(--border);
     flex-wrap: wrap;
@@ -852,8 +848,8 @@ html.window-mode #openWindowBtn {
 }
 
 .format-btn {
-    width: 30px;
-    height: 30px;
+    width: 28px;
+    height: 26px;
     border: 1px solid transparent;
     background: transparent;
     border-radius: 4px;
@@ -1099,6 +1095,24 @@ html.window-mode #openWindowBtn {
 .category-btn:hover {
     background-color: var(--bg-hover-strong);
     transform: scale(1.2);
+}
+
+/* Gira a engrenagem ao clicar (feedback visual ao abrir/fechar as categorias). */
+.category-btn.spin {
+    /* Gira pela propriedade INDEPENDENTE `rotate` (não pelo `transform`), pra não
+       brigar com o `transform: scale` do hover — era isso que deixava o giro
+       "seco" (pulo de escala). 360° completo = sem salto no fim. */
+    animation: gear-spin 0.6s ease-in-out;
+}
+
+@keyframes gear-spin {
+    from {
+        rotate: 0deg;
+    }
+
+    to {
+        rotate: 360deg;
+    }
 }
 
 /* ===== MODAL DE CATEGORIAS (popup flutuante) =====
@@ -1563,10 +1577,8 @@ html.window-mode #openWindowBtn {
     display: none;
 }
 
-/* Hovers das ações dos cards. */
-.note-actions .archive-btn:hover {
-    background-color: var(--bg-surface)3cd;
-}
+/* (o fundo do hover é padronizado em `.note-actions button:hover`; o valor
+   antigo do archive-btn estava quebrado e foi removido) */
 
 /* Botão restaurar: ícone SVG monocromático (setas circulares), verde no hover. */
 .restore-btn {
@@ -1581,7 +1593,6 @@ html.window-mode #openWindowBtn {
 }
 
 .note-actions .restore-btn:hover {
-    background-color: #d9f5f0;
     color: #0d9488;
 }
 
@@ -1620,28 +1631,14 @@ body.archived-view .options-wrap {
     box-shadow: var(--shadow-archived);
 }
 
-/* Micro-texto discreto sobre a caixa (quando não há arquivadas). */
-.box-tooltip {
-    position: fixed;
-    transform: translate(-50%, -100%);
-    background: var(--text-primary);
-    color: var(--bg-app);
-    font-size: var(--fs-micro);
-    padding: 3px 8px;
-    border-radius: 4px;
-    white-space: nowrap;
-    opacity: 0;
-    transition: opacity 0.2s;
-    pointer-events: none;
-    z-index: 1000;
-}
-
-.box-tooltip.visible {
-    opacity: 1;
-}
 
 /* A caixa treme quando não há arquivadas (reusa o keyframe category-shake). */
 .archive-box-btn.shake {
+    animation: category-shake 0.4s ease;
+}
+
+/* "Esvaziar" treme quando não há lembretes pra remover (feedback de ação vazia). */
+.clear-btn.shake {
     animation: category-shake 0.4s ease;
 }
 

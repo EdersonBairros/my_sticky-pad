@@ -198,7 +198,19 @@ async function handleClearAllNotes() {
     // Limpa apenas as notas da tela principal (não-arquivadas). As arquivadas
     // ficam guardadas em segurança.
     const hasMainNotes = getNotes().some(n => !n.archived);
-    if (!hasMainNotes) return;
+    if (!hasMainNotes) {
+        // Sem lembretes pra remover: dá um feedback (treme + toast), assim como a
+        // caixa 🗃️ treme quando não há arquivadas — nenhum botão fica "morto".
+        const btn = document.getElementById('clearAllBtn');
+        if (btn) {
+            btn.classList.remove('shake');
+            void btn.offsetWidth; // reinicia a animação
+            btn.classList.add('shake');
+            setTimeout(() => btn.classList.remove('shake'), 500);
+        }
+        showToast('Não há lembretes para remover.', 'warning');
+        return;
+    }
     const confirmed = await showConfirm('Limpar todos os lembretes? (As notas arquivadas serão mantidas.)');
     if (!confirmed) return;
     storageClearNonArchived();
