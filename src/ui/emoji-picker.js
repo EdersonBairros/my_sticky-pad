@@ -62,6 +62,17 @@ function switchEmojiCategory(picker, catIndex) {
     if (grid._scrollHandler) {
         grid.removeEventListener('scroll', grid._scrollHandler);
     }
+    if (grid._wheelHandler) {
+        grid.removeEventListener('wheel', grid._wheelHandler);
+    }
+    if (grid._advanceTimer) {
+        clearTimeout(grid._advanceTimer);
+        grid._advanceTimer = null;
+    }
+    if (grid._backTimer) {
+        clearTimeout(grid._backTimer);
+        grid._backTimer = null;
+    }
 
     grid.dataset.cat = catIndex;
 
@@ -77,15 +88,56 @@ function switchEmojiCategory(picker, catIndex) {
     });
 
     grid._scrollHandler = function () {
-        if (grid.scrollTop + grid.clientHeight >= grid.scrollHeight - 1) {
-            const next = parseInt(grid.dataset.cat) + 1;
-            if (next < cats.length) {
-                switchEmojiCategory(picker, next);
-                requestAnimationFrame(() => { grid.scrollTop = 0; });
-            }
+        // Rolou pra longe do topo → cancela o "voltar" que estava pendente.
+        if (grid.scrollTop > 0 && grid._backTimer) {
+            clearTimeout(grid._backTimer);
+            grid._backTimer = null;
+        }
+        const atBottom = grid.scrollTop + grid.clientHeight >= grid.scrollHeight - 1;
+        if (atBottom) {
+            // Só avança pra próxima aba se o usuário PERMANECER no fim por um
+            // instante — dá tempo de clicar num emoji do fim da lista sem o
+            // sistema "pular" de aba sozinho (tela pequena).
+            if (grid._advanceTimer) return;
+            grid._advanceTimer = setTimeout(() => {
+                grid._advanceTimer = null;
+                // Reconfirma: pode ter rolado pra cima nesse meio-tempo.
+                if (grid.scrollTop + grid.clientHeight < grid.scrollHeight - 1) return;
+                const next = parseInt(grid.dataset.cat) + 1;
+                if (next < cats.length) {
+                    switchEmojiCategory(picker, next);
+                    requestAnimationFrame(() => { grid.scrollTop = 0; });
+                }
+            }, 600);
+        } else if (grid._advanceTimer) {
+            // Saiu do fim antes do tempo → cancela o avanço.
+            clearTimeout(grid._advanceTimer);
+            grid._advanceTimer = null;
         }
     };
     grid.addEventListener('scroll', grid._scrollHandler);
+
+    // Voltar: rolando PRA CIMA já no topo, volta pra categoria anterior (o evento
+    // 'scroll' não dispara quando já se está em scrollTop 0, por isso usamos 'wheel').
+    // Vai pro TOPO da lista anterior (não pro fim) — senão a regra "no fim → próxima"
+    // dispararia na hora e prenderia o usuário num loop sem conseguir voltar.
+    grid._wheelHandler = function (e) {
+        if (e.deltaY < 0 && grid.scrollTop <= 0) {
+            // Mesmo atraso do avanço: só volta se INSISTIR (rolar pra cima) por um
+            // instante — dá tempo de clicar num emoji do topo antes de trocar de aba.
+            if (grid._backTimer) return;
+            grid._backTimer = setTimeout(() => {
+                grid._backTimer = null;
+                if (grid.scrollTop > 0) return; // saiu do topo nesse meio-tempo
+                const prev = parseInt(grid.dataset.cat) - 1;
+                if (prev >= 0) {
+                    switchEmojiCategory(picker, prev);
+                    requestAnimationFrame(() => { grid.scrollTop = 0; });
+                }
+            }, 600);
+        }
+    };
+    grid.addEventListener('wheel', grid._wheelHandler, { passive: true });
 }
 
 /**
