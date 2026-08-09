@@ -28,6 +28,25 @@ async function initStorage(onChange) {
     return _notes;
 }
 
+/**
+ * Sincroniza cópias abertas ao mesmo tempo (popup da barra + janela flutuante).
+ * Quando as notas mudam no armazenamento por OUTRA cópia, recarrega o cache e
+ * re-renderiza — assim nenhuma cópia trabalha com dados velhos e uma não
+ * sobrescreve a outra (evita "sumiço" de nota). Enquanto o usuário edita AQUI,
+ * ignora a atualização pra não atrapalhar a edição em andamento.
+ */
+function initStorageSync() {
+    if (!_hasChromeStorage || !chrome.storage.onChanged) return;
+    chrome.storage.onChanged.addListener(function (changes, area) {
+        if (area !== 'local' || !changes[STORAGE_KEYS.NOTES]) return;
+        // Não interrompe uma edição em andamento nesta cópia.
+        if (typeof getEditingId === 'function' && getEditingId()) return;
+        const next = changes[STORAGE_KEYS.NOTES].newValue;
+        _notes = Array.isArray(next) ? next : [];
+        if (typeof _onChangeCallback === 'function') _onChangeCallback(_notes);
+    });
+}
+
 async function _loadNotes() {
     try {
         const data = await storageGet(STORAGE_KEYS.NOTES);
@@ -117,22 +136,26 @@ function storageClearNonArchived() {
  * @returns {Promise<void>}
  */
 async function loadPopupSize() {
+    // Em modo janela (aberto como janela do SO), o tamanho é do próprio SO;
+    // não restauramos a altura salva do popup.
+    if (document.documentElement.classList.contains('window-mode')) return;
     try {
         const size = await storageGet(STORAGE_KEYS.SIZE);
-        if (size && size.width && size.height) {
-            // Aplica via setPopupSize (que clampa aos RESIZE_LIMITS). Importante:
-            // corrige tamanhos salvos antigos maiores que o teto do popup, que
-            // deixavam o rodape cortado / faziam a janela rolar.
-            setPopupSize(size.width, size.height);
+        if (size && size.height) {
+            // Largura é FIXA (350px, via CSS) — o resize horizontal quebra no popup
+            // do Chrome. Restaura só a ALTURA, com clamp aos limites (corrige também
+            // valores antigos fora do teto do popup). Compatível com registros
+            // legados {width, height} (só lemos .height).
+            const h = Math.min(RESIZE_LIMITS.MAX_HEIGHT, Math.max(RESIZE_LIMITS.MIN_HEIGHT, size.height));
+            document.body.style.height = h + 'px';
         }
     } catch (e) { /* tamanho é opcional; ignora falhas */ }
 }
 
 /**
- * Salva o tamanho do popup (fire-and-forget).
- * @param {number} width
+ * Salva a altura do popup (fire-and-forget). A largura é fixa (350px).
  * @param {number} height
  */
-function savePopupSize(width, height) {
-    storageSet(STORAGE_KEYS.SIZE, { width, height }).catch(() => {});
+function savePopupSize(height) {
+    storageSet(STORAGE_KEYS.SIZE, { height }).catch(() => {});
 }

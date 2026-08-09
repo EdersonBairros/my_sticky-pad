@@ -13,6 +13,7 @@ async function bootstrap() {
         exportMenuItem: document.getElementById('exportMenuItem'),
         importMenuItem: document.getElementById('importMenuItem'),
         importFileInput: document.getElementById('importFileInput'),
+        openWindowBtn: document.getElementById('openWindowBtn'),
         noteCount: document.getElementById('noteCount'),
         searchInput: document.getElementById('searchInput'),
         searchClearBtn: document.getElementById('searchClearBtn'),
@@ -35,6 +36,10 @@ async function bootstrap() {
         initCategories(),
         initFavoriteEmojis()
     ]);
+
+    // Mantém esta cópia sincronizada com outras abertas ao mesmo tempo
+    // (popup da barra + janela flutuante), evitando sobrescrita/perda de nota.
+    initStorageSync();
 
     // Limpeza defensiva: remove notas em branco herdadas de versões anteriores
     // ao fix do bug "Nota em branco".
@@ -72,6 +77,7 @@ async function bootstrap() {
     initThemeToggle($.themeToggle);
 
     $.addNoteBtn.addEventListener('click', () => handleAddNote());
+    $.openWindowBtn.addEventListener('click', () => handleOpenInWindow());
     $.clearAllBtn.addEventListener('click', () => handleClearAllNotes());
 
     _initActionDispatcher($.notesContainer);

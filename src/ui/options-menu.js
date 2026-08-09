@@ -75,6 +75,36 @@ function handleExport() {
 }
 
 /**
+ * Abre a extensão como JANELA independente, redimensionável livremente pelo SO
+ * (contorna a âncora do popup do Chrome, que trava o resize horizontal). A
+ * querystring `?mode=window` ativa o layout fluido (ver theme-init.js + .window-mode).
+ */
+async function handleOpenInWindow() {
+    if (typeof chrome === 'undefined' || !chrome.windows || !chrome.windows.create) {
+        showToast('Não foi possível abrir em janela neste navegador.', 'error');
+        return;
+    }
+    const url = chrome.runtime.getURL('popup.html?mode=window');
+
+    // Se a janela flutuante já estiver aberta, só a traz pra frente (evita abrir
+    // várias). Usa getContexts (Chrome 116+); se não existir, apenas abre nova.
+    if (chrome.runtime.getContexts) {
+        try {
+            const ctxs = await chrome.runtime.getContexts({ documentUrls: [url] });
+            const existing = ctxs && ctxs.find(c => c.windowId != null && c.windowId >= 0);
+            if (existing) {
+                chrome.windows.update(existing.windowId, { focused: true });
+                window.close();
+                return;
+            }
+        } catch (e) { /* segue e abre uma nova janela */ }
+    }
+
+    chrome.windows.create({ url, type: 'popup', width: 455, height: 560 });
+    window.close(); // fecha o popup da barra de ferramentas
+}
+
+/**
  * Processa a importação de um arquivo JSON.
  * @param {File} file
  * @param {HTMLElement} notesContainer
