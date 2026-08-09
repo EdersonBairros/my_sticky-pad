@@ -29,16 +29,9 @@
                 <button id="openWindowBtn" class="window-btn" type="button" title="Janela flutuante" aria-label="Janela flutuante">
                     <span class="window-btn-icon" aria-hidden="true"></span>
                 </button>
-                <div class="options-wrap">
-                    <button id="optionsBtn" class="options-btn" title="Mais opções">⋮</button>
-                    <div id="optionsMenu" class="options-menu">
-                        <button id="exportMenuItem" class="options-menu-item" data-action="export">📤 Exportar
-                            notas</button>
-                        <button id="importMenuItem" class="options-menu-item" data-action="import">📥 Importar
-                            notas</button>
-                        <input type="file" id="importFileInput" accept=".json,application/json" style="display: none;">
-                    </div>
-                </div>
+                <button id="supportBtn" class="support-btn" type="button" title="Apoie o projeto" aria-label="Apoie o projeto">
+                    <img class="support-btn-icon" src="icons/apoie.svg" alt="" aria-hidden="true">
+                </button>
             </div>
         </div>
         <div id="notesContainer" class="notes-container">
@@ -51,7 +44,19 @@
                 <button id="searchClearBtn" class="search-clear" title="Limpar busca" aria-label="Limpar busca">✕</button>
             </div>
             <button id="archiveBoxBtn" class="archive-box-btn" title="Notas arquivadas" aria-label="Notas arquivadas">🗃️</button>
-            <button id="clearAllBtn" class="clear-btn" title="Limpar todos os lembretes">🗑️ Limpar tudo</button>
+            <button id="clearAllBtn" class="clear-btn" title="Esvaziar — apaga todos os lembretes" aria-label="Esvaziar todos os lembretes">
+                <img class="clear-btn-icon" src="icons/esvaziar.svg" alt="" aria-hidden="true">
+            </button>
+            <div class="options-wrap">
+                <button id="optionsBtn" class="options-btn" title="Mais opções" aria-label="Mais opções">⋮</button>
+                <div id="optionsMenu" class="options-menu">
+                    <button id="exportMenuItem" class="options-menu-item" data-action="export">📤 Exportar
+                        notas</button>
+                    <button id="importMenuItem" class="options-menu-item" data-action="import">📥 Importar
+                        notas</button>
+                    <input type="file" id="importFileInput" accept=".json,application/json" style="display: none;">
+                </div>
+            </div>
         </div>
     </div>
     <script src="src/core/constants.js"></script>
@@ -75,6 +80,7 @@
     <script src="src/ui/views.js"></script>
     <script src="src/ui/theme.js"></script>
     <script src="src/ui/options-menu.js"></script>
+    <script src="src/ui/support.js"></script>
     <script src="src/core/note.controller.js"></script>
     <script src="src/core/app.js"></script>
     <script src="src/index.js"></script>
