@@ -20,11 +20,11 @@ html {
 body {
     /* Largura fixa do popup (o resize horizontal fica travado — ver resize.js).
        Calibrada pra o placeholder da busca no rodapé caber sem corte feio. */
-    width: 355px;
+    width: 330px;
     /* Altura padrão (1ª abertura, sem tamanho salvo): garante que o body tenha
        altura limitada, pra .notes-container rolar internamente com as barras
        fixas. O resize sobrescreve via style inline. */
-    height: 500px;
+    height: 440px;
     min-width: 250px;
     min-height: 200px;
     font-family: var(--font-ui);
@@ -92,7 +92,7 @@ html.window-mode #openWindowBtn {
     border-bottom: none;
     flex-shrink: 0;
     /* Acima da lista + sombra na borda de baixo: as notas passam por baixo do
-       cabeçalho ao rolar (profundidade nas barras fixas). */
+       cabeçalho ao rolar (profundidade nas barras fixas — PR 3.7.1). */
     position: relative;
     z-index: 2;
     box-shadow: var(--header-edge-shadow);
@@ -250,31 +250,30 @@ html.window-mode #openWindowBtn {
     position: relative;
 }
 
+/* Botão ⋮ (agora no rodapé, ao lado do 🗑️): ícone sem "pílula", igual ao 🗃️. */
 .options-btn {
-    width: 30px;
-    height: 30px;
     border: none;
-    background-color: var(--header-btn-bg);
-    color: var(--header-btn-fg);
-    font-size: 22px;
+    background: none;
+    color: var(--text-secondary);
+    font-size: 18px;
     line-height: 1;
-    border-radius: 50%;
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: transform 0.2s, background-color 0.2s;
+    padding: 4px 6px;
+    border-radius: 4px;
+    flex-shrink: 0;
+    transition: background-color 0.15s, transform 0.15s;
 }
 
 .options-btn:hover {
-    background-color: var(--header-btn-bg-hover);
-    transform: scale(1.25);
+    background-color: var(--bg-hover);
+    transform: scale(1.12);
 }
 
 .options-menu {
     display: none;
     position: absolute;
-    top: 38px;
+    /* Abre PRA CIMA (o ⋮ agora vive no rodapé). */
+    bottom: calc(100% + 6px);
     right: 0;
     min-width: 150px;
     background: var(--bg-surface);
@@ -306,6 +305,33 @@ html.window-mode #openWindowBtn {
 
 .options-menu-item:hover {
     background-color: var(--bg-hover);
+}
+
+/* Botão "Apoie o projeto" (☕) no cabeçalho — círculo neutro com o ícone SVG
+   colorido (fumaça vermelha, xícara roxa, pires azul). Mesmo hover do + e do ⋮. */
+.support-btn {
+    width: 30px;
+    height: 30px;
+    border: none;
+    background-color: var(--header-btn-bg);
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: transform 0.2s, background-color 0.2s;
+}
+
+.support-btn:hover {
+    background-color: var(--header-btn-bg-hover);
+    transform: scale(1.25);
+}
+
+.support-btn-icon {
+    width: 18px;
+    height: 18px;
+    display: block;
 }
 
 /* ===== NOTES CONTAINER ===== */
@@ -1378,9 +1404,11 @@ html.window-mode #openWindowBtn {
     background-color: transparent;
     flex-shrink: 0;
     gap: 8px;
-    /* Acima da lista + sombra na borda de cima (simétrico ao cabeçalho). */
+    /* Sombra na borda de cima (as notas passam por baixo ao rolar — PR 3.7.1).
+       z-index 20: o menu ⋮ (dropdown) fica ACIMA das tags de categoria (z-index
+       4), mas abaixo dos seletores de cor/emoji (30/50) ao editar uma nota. */
     position: relative;
-    z-index: 2;
+    z-index: 20;
     box-shadow: var(--footer-edge-shadow);
 }
 
@@ -1580,6 +1608,11 @@ body.archived-view .notes-container {
     background-color: transparent;
 }
 
+/* Na tela de arquivados, esconde o menu ⋮ do rodapé (como o 🗃️ e o 🗑️). */
+body.archived-view .options-wrap {
+    display: none;
+}
+
 /* Card de nota arquivada: borda cinza sutil + sombra para "flutuar" sobre o
    fundo cinza (visual "guardado" sem perder legibilidade). */
 .note-item.archived {
@@ -1642,23 +1675,29 @@ body.archived-view .notes-container {
     pointer-events: none;
 }
 
+/* Esvaziar: só o ícone colorido próprio (`esvaziar.svg`) — evita a redundância
+   com as lixeiras das notas e mantém o rodapé com botões só de ícone. */
 .clear-btn {
+    display: flex;
+    align-items: center;
     border: none;
     background: none;
-    color: #f44336;
-    font-size: var(--fs-caption);
-    font-weight: var(--fw-bold);
     cursor: pointer;
-    padding: 4px 8px;
+    padding: 4px 6px;
     border-radius: 4px;
-    transition: background-color 0.2s, transform 0.15s;
     flex-shrink: 0;
-    white-space: nowrap;
+    transition: background-color 0.15s, transform 0.12s;
 }
 
 .clear-btn:hover {
-    background-color: #ffebee;
-    transform: scale(1.08);
+    background-color: var(--bg-hover);
+    transform: scale(1.12);
+}
+
+.clear-btn-icon {
+    width: 18px;
+    height: 18px;
+    display: block;
 }
 
 /* ===== MODAL DE CONFIRMAÇÃO (substitui confirm() nativo) ===== */
@@ -1729,6 +1768,161 @@ body.archived-view .notes-container {
 .confirm-ok {
     background-color: #f44336;
     color: #fff;
+}
+
+/* ===== MODAL "APOIE O PROJETO" ===== */
+.support-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--overlay-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 12px;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+}
+
+.support-overlay.open {
+    opacity: 1;
+}
+
+.support-box {
+    position: relative;
+    background: var(--bg-surface);
+    border-radius: 10px;
+    box-shadow: var(--shadow-modal);
+    padding: 18px 18px 16px;
+    max-width: 290px;
+    width: 100%;
+    max-height: 100%;
+    overflow-y: auto;
+    text-align: center;
+    transform: scale(0.95);
+    transition: transform 0.15s ease;
+}
+
+.support-overlay.open .support-box {
+    transform: scale(1);
+}
+
+.support-close {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 24px;
+    height: 24px;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 14px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.support-close:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+}
+
+.support-title {
+    font-size: var(--fs-note-title);
+    font-weight: var(--fw-bold);
+    color: var(--text-primary);
+    letter-spacing: var(--ls-tight);
+    margin-bottom: 8px;
+}
+
+.support-message {
+    font-size: var(--fs-ui);
+    color: var(--text-secondary);
+    line-height: 1.5;
+    letter-spacing: var(--ls-body);
+    margin-bottom: 14px;
+}
+
+.support-qr {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 12px;
+}
+
+/* Fundo branco + "quiet zone": um QR precisa de área clara ao redor pra
+   escanear bem (inclusive no tema escuro). */
+.support-qr-img {
+    width: 150px;
+    height: 150px;
+    background: #fff;
+    padding: 8px;
+    border-radius: 8px;
+    display: block;
+}
+
+.support-qr-caption {
+    font-size: var(--fs-caption);
+    color: var(--text-muted);
+    font-weight: var(--fw-medium);
+}
+
+.support-key {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    background: var(--bg-note);
+    border-radius: 8px;
+    padding: 8px 10px;
+    margin-bottom: 14px;
+}
+
+.support-key-text {
+    font-size: var(--fs-ui);
+    color: var(--text-primary);
+}
+
+.support-key-value {
+    font-family: var(--font-mono);
+    word-break: break-all;
+}
+
+.support-copy {
+    flex-shrink: 0;
+    border: none;
+    background: var(--accent-gradient);
+    color: var(--text-on-accent);
+    font-size: var(--fs-caption);
+    font-weight: var(--fw-semibold);
+    padding: 5px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: filter 0.2s;
+}
+
+.support-copy:hover {
+    filter: brightness(1.1);
+}
+
+/* Bloco de transferência bancária: todo em negrito (a pedido). */
+.support-bank {
+    text-align: left;
+    font-size: var(--fs-ui);
+    font-weight: var(--fw-semibold);
+    color: var(--text-primary);
+    line-height: 1.6;
+    border-top: 1px solid var(--border-subtle);
+    padding-top: 12px;
+}
+
+.support-bank-title {
+    display: block;
+    margin-bottom: 4px;
 }
 
 /* ===== SCROLLBAR ===== */

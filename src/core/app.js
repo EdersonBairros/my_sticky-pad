@@ -14,6 +14,7 @@ async function bootstrap() {
         importMenuItem: document.getElementById('importMenuItem'),
         importFileInput: document.getElementById('importFileInput'),
         openWindowBtn: document.getElementById('openWindowBtn'),
+        supportBtn: document.getElementById('supportBtn'),
         noteCount: document.getElementById('noteCount'),
         searchInput: document.getElementById('searchInput'),
         searchClearBtn: document.getElementById('searchClearBtn'),
@@ -78,6 +79,7 @@ async function bootstrap() {
 
     $.addNoteBtn.addEventListener('click', () => handleAddNote());
     $.openWindowBtn.addEventListener('click', () => handleOpenInWindow());
+    $.supportBtn.addEventListener('click', () => openSupportModal());
     $.clearAllBtn.addEventListener('click', () => handleClearAllNotes());
 
     _initActionDispatcher($.notesContainer);

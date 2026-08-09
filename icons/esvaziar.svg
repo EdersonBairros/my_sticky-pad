@@ -1,0 +1,24 @@
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Nota do Fundo 3 (Verde) -->
+  <rect x="3" y="7" width="13" height="13" rx="1.5" transform="rotate(-12 9.5 13.5)" fill="#4ADE80"/>
+  
+  <!-- Nota do Fundo 2 (Azul) -->
+  <rect x="4" y="6" width="13" height="13" rx="1.5" transform="rotate(10 10.5 12.5)" fill="#38BDF8"/>
+  
+  <!-- Nota do Fundo 1 (Rosa) -->
+  <rect x="4" y="6" width="13" height="13" rx="1.5" transform="rotate(-4 10.5 12.5)" fill="#F43F5E"/>
+  
+  <!-- Nota Principal da Frente (Amarela) -->
+  <rect x="4" y="7" width="13" height="13" rx="1.5" fill="#FACC15"/>
+  <!-- Linhas de texto da nota principal -->
+  <line x1="7" y1="10" x2="13" y2="10" stroke="#EAB308" stroke-width="1.2" stroke-linecap="round"/>
+  <line x1="7" y1="13" x2="14" y2="13" stroke="#EAB308" stroke-width="1.2" stroke-linecap="round"/>
+  <line x1="7" y1="16" x2="11" y2="16" stroke="#EAB308" stroke-width="1.2" stroke-linecap="round"/>
+
+  <!-- Partículas / Pedaços de papel CAINDO (papel triturado descendo) -->
+  <rect x="18" y="11" width="1.8" height="1.8" rx="0.4" fill="#38BDF8"/>
+  <rect x="20.3" y="14" width="1.5" height="1.5" rx="0.3" fill="#F43F5E"/>
+  <rect x="17.5" y="17" width="2" height="2" rx="0.5" fill="#FACC15"/>
+  <rect x="20" y="19.5" width="1.4" height="1.4" rx="0.3" fill="#4ADE80"/>
+  <rect x="18.5" y="22" width="1.2" height="1.2" rx="0.3" fill="#FB923C"/>
+</svg>

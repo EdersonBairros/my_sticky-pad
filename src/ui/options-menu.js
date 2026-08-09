@@ -100,7 +100,7 @@ async function handleOpenInWindow() {
         } catch (e) { /* segue e abre uma nova janela */ }
     }
 
-    chrome.windows.create({ url, type: 'popup', width: 455, height: 560 });
+    chrome.windows.create({ url, type: 'popup', width: 420, height: 560 });
     window.close(); // fecha o popup da barra de ferramentas
 }
 
