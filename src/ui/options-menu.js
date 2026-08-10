@@ -25,6 +25,13 @@ function initOptionsMenu(elements) {
 
     optionsBtn.addEventListener('click', function (e) {
         e.stopPropagation();
+        // Giro suave da engrenagem ao abrir/fechar o menu (mesmo efeito do
+        // botão de categoria): só inicia se não estiver girando, e a classe sai
+        // quando a animação termina (nunca corta no meio).
+        if (!optionsBtn.classList.contains('spin')) {
+            optionsBtn.classList.add('spin');
+            optionsBtn.addEventListener('animationend', () => optionsBtn.classList.remove('spin'), { once: true });
+        }
         const isOpen = optionsMenu.classList.toggle('open');
         if (isOpen) {
             closeEmojiPicker();

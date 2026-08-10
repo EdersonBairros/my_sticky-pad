@@ -80,6 +80,8 @@ function _buildArchivedNote(div, note) {
  * @param {object} note
  */
 function _buildEditingNote(div, note) {
+    // O ícone de tag nasce preenchido (active) se a nota já tem uma categoria.
+    const tagActiveClass = note.category ? ' active' : '';
     div.innerHTML = `
         <input type="text" class="note-title-input" placeholder="Título (opcional)" maxlength="${MAX_TITLE_LENGTH}">
         <div class="format-toolbar">
@@ -104,7 +106,7 @@ function _buildEditingNote(div, note) {
             <button class="emoji-btn" data-action="emoji-toggle" title="Inserir emoji">😊</button>
         </div>
         <div class="edit-actions">
-            <button class="category-btn" data-action="category-toggle" title="Categorias" aria-label="Categorias"><span class="gear-icon" aria-hidden="true"></span></button>
+            <button class="category-btn" data-action="category-toggle" title="Categorias" aria-label="Categorias"><span class="tag-icon${tagActiveClass}" aria-hidden="true"></span></button>
             <div class="edit-actions-right">
                 <button class="pin-btn edit-pin ${note.pinned ? 'active' : ''}" data-action="pin-toggle" title="${note.pinned ? 'Desafixar nota' : 'Fixar nota'}" aria-label="${note.pinned ? 'Desafixar nota' : 'Fixar nota'}">📌</button>
                 <button class="save-btn" data-action="save">💾 Salvar</button>
