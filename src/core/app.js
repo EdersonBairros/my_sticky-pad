@@ -120,11 +120,10 @@ function _initActionDispatcher(container) {
             case 'toggle-custom': _toggleCustomColor(item); break;
             case 'apply-hex': _applyHexInput(item, id); break;
             case 'category-toggle':
-                // Giro suave da engrenagem: só inicia se não estiver girando, e a
-                // classe sai quando a animação termina (nunca corta no meio).
-                if (!target.classList.contains('spin')) {
-                    target.classList.add('spin');
-                    target.addEventListener('animationend', () => target.classList.remove('spin'), { once: true });
+                // O icone de tag balanca (swing) + preenche de azul ao clicar.
+                if (!target.classList.contains('swing')) {
+                    target.classList.add('swing');
+                    target.addEventListener('animationend', () => target.classList.remove('swing'), { once: true });
                 }
                 // Toggle: se o modal já está aberto, fecha; senão, abre.
                 if (document.querySelector('.category-modal')) {
@@ -132,6 +131,9 @@ function _initActionDispatcher(container) {
                 } else {
                     openCategoryModal(id, item);
                 }
+                // Estado ativo: preenchido enquanto o modal estiver aberto OU a
+                // nota tiver uma tag associada.
+                _updateCategoryBtnState(item);
                 break;
         }
     });
@@ -174,6 +176,9 @@ function _initCategoryDispatchers() {
         const radio = e.target.closest('input[data-action="category-select"]');
         if (radio) {
             selectCategory(radio.value);
+            // Ao selecionar, atualiza o estado ativo da tag na nota em edicao.
+            const noteItem = document.querySelector(`.note-item[data-id="${_activeNoteId}"]`);
+            if (noteItem) _updateCategoryBtnState(noteItem);
         }
     });
 
@@ -216,7 +221,13 @@ function _initGlobalCloseDispatchers() {
     document.addEventListener('click', e => {
         if (!e.target.closest('.emoji-picker') && !e.target.closest('.emoji-btn')) closeEmojiPicker();
         if (!e.target.closest('.color-picker-dropdown') && !e.target.closest('.color-btn')) closeColorPickers();
-        if (!e.target.closest('.category-modal') && !e.target.closest('[data-action="category-toggle"]')) closeCategoryModal();
+        if (!e.target.closest('.category-modal') && !e.target.closest('[data-action="category-toggle"]')) {
+            closeCategoryModal();
+            // Ao fechar o modal por clique fora, atualiza o estado da tag
+            // (se a nota ainda esta em edicao).
+            const editingItem = document.querySelector('.note-item.editing');
+            if (editingItem) _updateCategoryBtnState(editingItem);
+        }
     });
 }
 
@@ -277,6 +288,23 @@ function _initToolbarStateUpdaters(container) {
 }
 
 // === Helpers de UI inline ===
+
+/**
+ * Atualiza o estado ativo do icone de tag no botao de categoria.
+ * O icone fica preenchido (azul) quando o modal de categorias estiver
+ * aberto OU a nota tiver uma tag associada.
+ * @param {HTMLElement} item - Elemento .note-item
+ */
+function _updateCategoryBtnState(item) {
+    if (!item) return;
+    const tagIcon = item.querySelector('.tag-icon');
+    if (!tagIcon) return;
+    const id = item.dataset.id;
+    const note = getNoteById(id);
+    const modalOpen = !!document.querySelector('.category-modal');
+    const hasCategory = !!(note && note.category);
+    tagIcon.classList.toggle('active', modalOpen || hasCategory);
+}
 
 function _toggleEmojiPicker(item, btn) {
     const picker = item.querySelector('.emoji-picker');

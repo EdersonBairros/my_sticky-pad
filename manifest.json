@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "My sticky pad",
-    "version": "3.9.1",
+    "version": "3.10.0",
     "description": "Extensão de sticky-pad para criar lembretes rápidos em popup",
     "permissions": [
         "storage"

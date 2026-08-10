@@ -258,8 +258,13 @@ html.window-mode #openWindowBtn {
     font-size: 18px;
     line-height: 1;
     cursor: pointer;
-    padding: 4px 6px;
-    border-radius: 4px;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     flex-shrink: 0;
     transition: background-color 0.15s, transform 0.15s;
 }
@@ -1080,7 +1085,7 @@ html.window-mode #openWindowBtn {
     border-radius: 2px;
 }
 
-/* ===== BOTÃO CATEGORIA (ENGENRAGEM) ===== */
+/* ===== BOTÃO CATEGORIA (ÍCONE DE TAG) ===== */
 .category-btn {
     border: none;
     background: none;
@@ -1097,21 +1102,63 @@ html.window-mode #openWindowBtn {
     transform: scale(1.1);
 }
 
-.gear-icon {
+.tag-icon {
     display: inline-block;
     width: 16px;
     height: 16px;
     vertical-align: middle;
     background-color: var(--text-secondary);
+    -webkit-mask: url('icons/tag-icon.svg') center / contain no-repeat;
+    mask: url('icons/tag-icon.svg') center / contain no-repeat;
+}
+
+.tag-icon.active {
+    background-color: var(--accent);
+    -webkit-mask: url('icons/tag-icon-filled.svg') center / contain no-repeat;
+    mask: url('icons/tag-icon-filled.svg') center / contain no-repeat;
+}
+
+.category-btn.swing {
+    animation: tag-swing 0.8s ease-in-out;
+}
+
+@keyframes tag-swing {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    25% {
+        transform: rotate(12deg);
+    }
+
+    50% {
+        transform: rotate(-8deg);
+    }
+
+    75% {
+        transform: rotate(5deg);
+    }
+
+    100% {
+        transform: rotate(0deg);
+    }
+}
+
+/* ===== BOTÃO DE OPÇÕES (ENGENRAGEM) ===== */
+/* Ícone da engrenagem dentro do botão ⋮ (agora no rodapé). A cor segue o texto
+   do botão via currentColor, como os demais ícones temáticos. */
+.options-btn .gear-icon {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    vertical-align: middle;
+    background-color: currentColor;
     -webkit-mask: url('icons/gear-icon.svg') center / contain no-repeat;
     mask: url('icons/gear-icon.svg') center / contain no-repeat;
 }
 
-/* Gira a engrenagem ao clicar (feedback visual ao abrir/fechar as categorias). */
-.category-btn.spin {
-    /* Gira pela propriedade INDEPENDENTE `rotate` (não pelo `transform`), pra não
-       brigar com o `transform: scale` do hover — era isso que deixava o giro
-       "seco" (pulo de escala). 360° completo = sem salto no fim. */
+/* Giro da engrenagem ao clicar. */
+.options-btn.spin {
     animation: gear-spin 0.6s ease-in-out;
 }
 
