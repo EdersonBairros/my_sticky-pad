@@ -104,7 +104,7 @@ function _buildEditingNote(div, note) {
             <button class="emoji-btn" data-action="emoji-toggle" title="Inserir emoji">😊</button>
         </div>
         <div class="edit-actions">
-            <button class="category-btn" data-action="category-toggle" title="Categorias">⚙️</button>
+            <button class="category-btn" data-action="category-toggle" title="Categorias" aria-label="Categorias"><span class="gear-icon" aria-hidden="true"></span></button>
             <div class="edit-actions-right">
                 <button class="pin-btn edit-pin ${note.pinned ? 'active' : ''}" data-action="pin-toggle" title="${note.pinned ? 'Desafixar nota' : 'Fixar nota'}" aria-label="${note.pinned ? 'Desafixar nota' : 'Fixar nota'}">📌</button>
                 <button class="save-btn" data-action="save">💾 Salvar</button>

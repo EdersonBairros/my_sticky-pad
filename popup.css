@@ -1094,7 +1094,17 @@ html.window-mode #openWindowBtn {
 
 .category-btn:hover {
     background-color: var(--bg-hover-strong);
-    transform: scale(1.2);
+    transform: scale(1.1);
+}
+
+.gear-icon {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    vertical-align: middle;
+    background-color: var(--text-secondary);
+    -webkit-mask: url('icons/gear-icon.svg') center / contain no-repeat;
+    mask: url('icons/gear-icon.svg') center / contain no-repeat;
 }
 
 /* Gira a engrenagem ao clicar (feedback visual ao abrir/fechar as categorias). */
