@@ -1963,22 +1963,6 @@ body.archived-view .options-wrap {
     filter: brightness(1.1);
 }
 
-/* Bloco de transferência bancária: todo em negrito (a pedido). */
-.support-bank {
-    text-align: left;
-    font-size: var(--fs-ui);
-    font-weight: var(--fw-semibold);
-    color: var(--text-primary);
-    line-height: 1.6;
-    border-top: 1px solid var(--border-subtle);
-    padding-top: 12px;
-}
-
-.support-bank-title {
-    display: block;
-    margin-bottom: 4px;
-}
-
 /* ===== SCROLLBAR ===== */
 .notes-container::-webkit-scrollbar {
     width: 6px;

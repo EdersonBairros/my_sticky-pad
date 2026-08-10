@@ -1,22 +1,17 @@
 /**
- * Modal "Apoie o projeto" — exibe os dados de doação (Pix + transferência).
+ * Modal "Apoie o projeto" — exibe os dados de doação (Pix).
  * Segue o padrão de modal do projeto (overlay + caixa, fecha no Esc / clique
  * fora, abre com a classe `.open`) — ver `showConfirm` em notifications.js.
  * @module ui/support
  */
 
 /**
- * Dados de apoio. ÚNICO ponto para editar chave/banco.
+ * Dados de apoio. ÚNICO ponto para editar a chave.
  * `pixKey` é o que aparece no texto E o que o botão "Copiar" copia.
  * (Para não expor o CPF publicamente, troque por uma chave Pix aleatória aqui.)
  */
 const SUPPORT_INFO = {
-    pixKey: 'f44d1332-52cf-4704-85ce-4671101b77ed', // chave aleatória (não expõe o CPF)
-    holder: 'Ederson Paulo de Bairros',
-    cpf: '086.371.159-69',
-    bankName: 'Banco Pan S. A.',
-    agency: '0001',
-    account: '032401076-0'
+    pixKey: 'f44d1332-52cf-4704-85ce-4671101b77ed' // chave aleatória (não expõe o CPF)
 };
 
 const SUPPORT_MESSAGE =
@@ -45,32 +40,12 @@ function openSupportModal() {
                 <span class="support-key-text"><strong>PIX KEY:</strong> <span class="support-key-value"></span></span>
                 <button class="support-copy" type="button">Copiar</button>
             </div>
-            <div class="support-bank"></div>
         </div>
     `;
 
     // Textos dinâmicos via textContent (boa prática do projeto: nunca injetar HTML).
     overlay.querySelector('.support-message').textContent = SUPPORT_MESSAGE;
     overlay.querySelector('.support-key-value').textContent = SUPPORT_INFO.pixKey;
-
-    // Bloco de transferência bancária (o CSS deixa tudo em negrito).
-    const bank = overlay.querySelector('.support-bank');
-    const title = document.createElement('strong');
-    title.className = 'support-bank-title';
-    title.textContent = 'Transferência bancária';
-    bank.appendChild(title);
-    [
-        ['Favorecido', SUPPORT_INFO.holder],
-        ['CPF', SUPPORT_INFO.cpf],
-        ['Banco', SUPPORT_INFO.bankName],
-        ['Agência', SUPPORT_INFO.agency],
-        ['Conta', SUPPORT_INFO.account]
-    ].forEach(([label, value]) => {
-        const line = document.createElement('div');
-        line.className = 'support-bank-line';
-        line.textContent = `${label}: ${value}`;
-        bank.appendChild(line);
-    });
 
     document.body.appendChild(overlay);
 
