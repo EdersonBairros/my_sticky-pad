@@ -820,6 +820,37 @@ html.window-mode #openWindowBtn {
     border-left-color: var(--accent);
     padding: 0;
     overflow: visible;
+    /* Coluna flex limitada à altura visível da lista: título + toolbar (topo) e
+       a barra de ações (rodapé) ficam FIXOS, e o editor preenche o meio rolando
+       internamente. Evita que texto longo empurre Salvar/Cancelar pra fora da
+       tela (o scroll passa a ser só do editor, na hora certa). */
+    display: flex;
+    flex-direction: column;
+    max-height: 100%;
+    margin-bottom: 0;
+}
+
+/* Partes fixas do formulário (não encolhem): topo e rodapé. */
+.note-item.editing .note-title-input,
+.note-item.editing .format-toolbar,
+.note-item.editing .edit-actions {
+    flex-shrink: 0;
+}
+
+/* O editor preenche o espaço que sobra e rola internamente. */
+.note-item.editing .editor-wrapper {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.note-item.editing .note-editor {
+    flex: 1 1 auto;
+    min-height: 80px;
+    /* Sem teto fixo: preenche o espaço disponível (antes travava em 300px, o que
+       estourava a altura do popup e criava o scroll externo que escondia a barra). */
+    max-height: none;
 }
 
 .note-item.editing .color-btn,
