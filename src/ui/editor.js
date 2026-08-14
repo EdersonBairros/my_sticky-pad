@@ -91,6 +91,39 @@ function setEditorHTML(html) {
 }
 
 /**
+ * Bloqueia imagens coladas no editor (screenshot, "copiar imagem", etc.). Sem
+ * isto, o navegador insere a imagem DE VERDADE no editor — só some depois, ao
+ * salvar, pelo `sanitizeHtml()` (choke point de XSS) — dando a impressão de
+ * que "sumiu sozinha" sem explicação. Só age quando a área de transferência
+ * tem um ARQUIVO de imagem; colar texto (puro ou formatado) nunca passa por
+ * aqui e segue o comportamento padrão do navegador, sem nenhuma mudança.
+ */
+function bindEditorPasteGuard() {
+    document.addEventListener('paste', function (e) {
+        const editor = e.target.closest('.note-editor');
+        if (!editor) return;
+
+        const clipboard = e.clipboardData || window.clipboardData;
+        if (!clipboard) return;
+
+        const hasImageFile = Array.from(clipboard.items || [])
+            .some(item => item.kind === 'file' && item.type.startsWith('image/'));
+        if (!hasImageFile) return;
+
+        e.preventDefault();
+        const text = clipboard.getData('text/plain');
+        // Mensagens curtas de propósito: cabem numa linha só no popup (330px),
+        // sem precisar alterar o componente de toast (nowrap padrão).
+        if (text) {
+            document.execCommand('insertText', false, text);
+            showToast('Imagem bloqueada; texto foi colado.', 'warning');
+        } else {
+            showToast('Imagens não são suportadas.', 'warning');
+        }
+    });
+}
+
+/**
  * Cria eventos de teclado para salvar (Ctrl+Enter) e cancelar (Escape).
  * @param {Function} onSave - Callback para salvar
  * @param {Function} onCancel - Callback para cancelar
