@@ -91,12 +91,14 @@ function setEditorHTML(html) {
 }
 
 /**
- * Bloqueia imagens coladas no editor (screenshot, "copiar imagem", etc.). Sem
- * isto, o navegador insere a imagem DE VERDADE no editor — só some depois, ao
- * salvar, pelo `sanitizeHtml()` (choke point de XSS) — dando a impressão de
- * que "sumiu sozinha" sem explicação. Só age quando a área de transferência
- * tem um ARQUIVO de imagem; colar texto (puro ou formatado) nunca passa por
- * aqui e segue o comportamento padrão do navegador, sem nenhuma mudança.
+ * Bloqueia imagens coladas no editor (screenshot, "copiar imagem", texto com
+ * imagem embutida de uma página/Word, etc.). Sem isto, o navegador insere a
+ * imagem DE VERDADE no editor — só some depois, ao salvar, pelo
+ * `sanitizeHtml()` (choke point de XSS) — dando a impressão de que "sumiu
+ * sozinha" sem explicação. Só age quando a área de transferência tem uma
+ * imagem (arquivo puro OU `<img>` embutido no HTML colado junto com texto);
+ * colar texto (puro ou formatado, sem imagem) nunca passa por aqui e segue o
+ * comportamento padrão do navegador, sem nenhuma mudança.
  */
 function bindEditorPasteGuard() {
     document.addEventListener('paste', function (e) {
@@ -106,9 +108,13 @@ function bindEditorPasteGuard() {
         const clipboard = e.clipboardData || window.clipboardData;
         if (!clipboard) return;
 
+        // Imagem "pura" (screenshot, "copiar imagem"): vem como arquivo no
+        // clipboard. Imagem JUNTO com texto (de uma página, Word, etc.): vem
+        // embutida como <img> dentro do HTML colado, sem nenhum arquivo à parte.
         const hasImageFile = Array.from(clipboard.items || [])
             .some(item => item.kind === 'file' && item.type.startsWith('image/'));
-        if (!hasImageFile) return;
+        const hasImageTag = /<img[\s>]/i.test(clipboard.getData('text/html') || '');
+        if (!hasImageFile && !hasImageTag) return;
 
         e.preventDefault();
         const text = clipboard.getData('text/plain');
