@@ -48,6 +48,23 @@ function initOptionsMenu(elements) {
     importMenuItem.addEventListener('click', function (e) {
         e.stopPropagation();
         optionsMenu.classList.remove('open');
+
+        // No Firefox, abrir o seletor de arquivo do SO tira o foco do popup da
+        // barra de ferramentas, e o Firefox FECHA popups de extensão ao perder
+        // o foco — cancelando a escolha do arquivo antes do 'change' disparar
+        // (falha silenciosa: nada acontece, sem erro). Na janela flutuante
+        // (janela de verdade, não popup ancorado) isso não ocorre. Detecção via
+        // user-agent (não via `typeof browser`): o namespace `browser` já não é
+        // exclusividade do Firefox — builds recentes de Chrome também o expõem.
+        const isFirefox = /firefox/i.test(navigator.userAgent);
+        const isWindowMode = document.documentElement.classList.contains('window-mode');
+        if (isFirefox && !isWindowMode) {
+            // Mensagem curta de propósito: cabe numa linha só no popup (330px),
+            // sem precisar alterar o componente de toast (nowrap padrão).
+            showToast('Firefox: importe pela janela flutuante.', 'warning');
+            return;
+        }
+
         importFileInput.click();
     });
 
