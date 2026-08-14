@@ -258,6 +258,7 @@ function _initEditorEvents() {
         id => saveEditing(id),
         () => handleCancelEditing()
     );
+    bindEditorPasteGuard();
 }
 
 function _initHexKeyHandler(container) {
