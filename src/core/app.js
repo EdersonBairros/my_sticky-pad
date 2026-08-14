@@ -13,6 +13,7 @@ async function bootstrap() {
         exportMenuItem: document.getElementById('exportMenuItem'),
         importMenuItem: document.getElementById('importMenuItem'),
         importFileInput: document.getElementById('importFileInput'),
+        reportBugMenuItem: document.getElementById('reportBugMenuItem'),
         openWindowBtn: document.getElementById('openWindowBtn'),
         supportBtn: document.getElementById('supportBtn'),
         noteCount: document.getElementById('noteCount'),
@@ -55,6 +56,7 @@ async function bootstrap() {
         exportMenuItem: $.exportMenuItem,
         importMenuItem: $.importMenuItem,
         importFileInput: $.importFileInput,
+        reportBugMenuItem: $.reportBugMenuItem,
         notesContainer: $.notesContainer
     });
 

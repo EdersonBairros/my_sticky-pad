@@ -11,6 +11,7 @@
  * @param {HTMLElement} elements.exportMenuItem - Item "Exportar"
  * @param {HTMLElement} elements.importMenuItem - Item "Importar"
  * @param {HTMLElement} elements.importFileInput - Input file oculto
+ * @param {HTMLElement} elements.reportBugMenuItem - Item "Reportar um bug"
  * @param {HTMLElement} elements.notesContainer - Container de notas
  */
 function initOptionsMenu(elements) {
@@ -20,6 +21,7 @@ function initOptionsMenu(elements) {
         exportMenuItem,
         importMenuItem,
         importFileInput,
+        reportBugMenuItem,
         notesContainer
     } = elements;
 
@@ -68,6 +70,15 @@ function initOptionsMenu(elements) {
         importFileInput.click();
     });
 
+    reportBugMenuItem.addEventListener('click', function (e) {
+        e.stopPropagation();
+        optionsMenu.classList.remove('open');
+        // Aba nova (não mailto:): o Forms tem campo de upload de print/vídeo,
+        // que exige a tela de verdade do Google (mailto: não suportaria anexo,
+        // e um seletor de arquivo do SO ainda fecharia popups no Firefox).
+        window.open(_buildBugReportUrl(), '_blank');
+    });
+
     importFileInput.addEventListener('change', function (e) {
         const file = e.target.files && e.target.files[0];
         if (file) {
@@ -96,6 +107,35 @@ function handleExport() {
     const data = buildExportData(notes);
     downloadJSON(data, getExportFilename());
     showToast('Notas exportadas com sucesso!', 'success');
+}
+
+/**
+ * Detecta o navegador atual para pré-selecionar o campo "Navegador usado" do
+ * Forms — precisa bater com o TEXTO EXATO das opções do formulário. Brave se
+ * identifica via `navigator.brave` (só existe nele); os demais, por trechos
+ * característicos do user-agent (Vivaldi e Edge incluem o próprio nome nele;
+ * Brave e Chrome puro não, daí a ordem de checagem importar).
+ * @returns {string}
+ */
+function _detectBrowserOptionLabel() {
+    const ua = navigator.userAgent;
+    if (navigator.brave) return 'Brave';
+    if (/Edg\//.test(ua)) return 'Microsoft Edge';
+    if (/Vivaldi/.test(ua)) return 'Vivaldi';
+    if (/Firefox/.test(ua)) return 'FireFox';
+    return 'Google Chrome';
+}
+
+/**
+ * Monta o link do Google Forms de "Reportar um bug", com o campo "Navegador
+ * usado" pré-preenchido (poupa o usuário de descrever isso manualmente). Os
+ * demais campos ficam em branco, para o usuário preencher com suas palavras.
+ * @returns {string}
+ */
+function _buildBugReportUrl() {
+    const params = new URLSearchParams({ usp: 'pp_url' });
+    params.set(`entry.${BUG_REPORT_BROWSER_ENTRY_ID}`, _detectBrowserOptionLabel());
+    return `${BUG_REPORT_FORM_URL}?${params.toString()}`;
 }
 
 /**

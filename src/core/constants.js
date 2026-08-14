@@ -37,3 +37,9 @@ const MAX_TITLE_LENGTH = 25;
 
 // Campo de busca: limita para não quebrar o layout do rodapé.
 const MAX_SEARCH_LENGTH = 30;
+
+// Destino do "Reportar um bug" (menu ⋮): Google Forms (suporta anexo de
+// print/vídeo, o que um mailto: não permitiria). ID do campo "Navegador
+// usado" para pré-selecionar automaticamente (ver options-menu.js).
+const BUG_REPORT_FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLScCsgvH7jhkxoQqhFqij749PyayDfzrVFRWf_QcOEntgwmaiQ/viewform';
+const BUG_REPORT_BROWSER_ENTRY_ID = '1261568458';
