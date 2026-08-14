@@ -286,9 +286,12 @@ function _noteMatches(note, nterm) {
  * @returns {string}
  */
 function _htmlToText(html) {
-    const div = document.createElement('div');
-    div.innerHTML = html;
-    return div.textContent || '';
+    // `<template>` faz o parse SEM executar scripts nem carregar recursos (mesma
+    // técnica do choke point em utils/dom.js) — mais seguro que um `<div>` "vivo"
+    // mesmo com o texto já sanitizado no save, pois aqui é só extração de texto.
+    const template = document.createElement('template');
+    template.innerHTML = html;
+    return template.content.textContent || '';
 }
 
 /**
