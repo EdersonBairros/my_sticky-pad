@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
-    "name": "My sticky pad",
-    "version": "3.12.1",
+    "name": "Sticky Pad",
+    "version": "3.12.2",
     "description": "Bloco de notas rápido no navegador: lembretes, categorias, cores e emojis. Simples, privado e 100% local.",
     "permissions": [
         "storage"
