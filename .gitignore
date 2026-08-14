@@ -3,3 +3,4 @@ package.json
 package-lock.json
 *.zip
 PUBLISHING.md
+dist/
